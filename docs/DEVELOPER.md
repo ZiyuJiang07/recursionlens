@@ -12,7 +12,7 @@ The runtime package uses only the Python standard library. IPython is discovered
 
 ## Development loop
 
-1. Read `SPEC.md` and turn the intended change into a testable acceptance criterion.
+1. Read `README.md`, the relevant guide, and the tests; turn the intended change into a testable acceptance criterion.
 2. Commit the current working state before a large agent-driven edit.
 3. Add or update a focused test.
 4. Implement one module at a time.
@@ -36,7 +36,7 @@ The package is designed for synchronous, deterministic teaching functions. The t
 
 ## Agent continuation prompt
 
-> Read SPEC.md, docs/DEVELOPER.md, and the relevant tests. State the acceptance criterion before editing. Implement one focused change, run the complete test suite, inspect a generated report for user-visible regressions, and explain any invariant affected. Do not broaden the supported function domain without updating the specification and tests.
+> Read README.md, docs/DEVELOPER.md, and the relevant tests. State the acceptance criterion before editing. Implement one focused change, run the complete test suite, inspect a generated report for user-visible regressions, and explain any invariant affected. Do not broaden the supported function domain without updating the documentation and tests.
 
 ## Release checks
 

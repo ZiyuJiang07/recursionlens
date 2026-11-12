@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 — 2026-11-12
+
+### Changed
+
+- Prepared the first PyPI release with `pip install recursionlens` as the primary installation method.
+- Added the CS1302A Group 50 team to package author metadata and project documentation.
+- Converted PyPI-facing documentation links to absolute GitHub URLs.
+- Updated license metadata to the SPDX format and removed deprecated license classifiers.
+- Added explicit Documentation, Tutorial, and Changelog project URLs.
+
 ## 0.1.1 — 2026-11-12
 
 ### Added

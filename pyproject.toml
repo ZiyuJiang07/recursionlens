@@ -1,20 +1,26 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursionlens"
-version = "0.1.1"
+version = "0.1.2"
 description = "Interactive recursion tracing, subproblem DAGs, and memoization comparisons for JupyterLab."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
-authors = [{ name = "Ziyu Jiang" }]
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Ziyu Jiang" },
+  { name = "Xinyue Cai" },
+  { name = "Kehan Cao" },
+  { name = "Ruoxi Lyu" },
+  { name = "Haobo Ma" },
+]
 keywords = ["recursion", "jupyterlab", "visualization", "memoization", "education"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Education",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Framework :: Jupyter",
@@ -23,7 +29,9 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/ZiyuJiang07/recursionlens"
 Repository = "https://github.com/ZiyuJiang07/recursionlens"
-Documentation = "https://github.com/ZiyuJiang07/recursionlens#readme"
+Documentation = "https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/USER.md"
+Tutorial = "https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb"
+Changelog = "https://github.com/ZiyuJiang07/recursionlens/blob/main/CHANGELOG.md"
 Issues = "https://github.com/ZiyuJiang07/recursionlens/issues"
 
 [project.optional-dependencies]

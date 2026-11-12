@@ -4,7 +4,17 @@
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 
-> **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](docs/RecursionLens_Tutorial.ipynb). All eight code cells have saved output. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](docs/RecursionLens_Tutorial.html).
+> **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb). All eight code cells have saved output. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html).
+
+## Project team
+
+CS1302A Group 50:
+
+- Ziyu Jiang
+- Xinyue CAI
+- Kehan CAO
+- Ruoxi LYU
+- Haobo MA
 
 ## Why RecursionLens?
 
@@ -29,10 +39,12 @@ The existing `rcviz` package documents decorator-based recursion trees with argu
 
 ## Installation
 
-RecursionLens requires Python 3.9 or later. The 0.1 development version can be installed from GitHub:
+RecursionLens requires Python 3.9 or later.
+
+Install from PyPI:
 
 ```bash
-python -m pip install git+https://github.com/ZiyuJiang07/recursionlens.git
+python -m pip install recursionlens
 ```
 
 For local development:
@@ -43,7 +55,7 @@ cd recursionlens
 python -m pip install -e ".[dev]"
 ```
 
-PyPI publication is a separate release step; this repository does not claim that a PyPI release already exists.
+The package has no runtime dependencies.
 
 ## Quickstart in JupyterLab
 
@@ -112,23 +124,23 @@ Version 0.1 targets synchronous, deterministic teaching examples such as factori
 
 ## Documentation and demo
 
-- [Executed JupyterLab tutorial](docs/RecursionLens_Tutorial.ipynb) - setup, three views, comparison, export, troubleshooting, and a one-minute demo recipe
-- [Static HTML tutorial preview](docs/RecursionLens_Tutorial.html) - the same tutorial with all visual reports rendered, no Jupyter required
-- [Runnable example notebook](examples/demo.ipynb)
-- [User guide](docs/USER.md)
-- [Developer guide](docs/DEVELOPER.md)
-- [Specification and acceptance criteria](SPEC.md)
-- [Changelog](CHANGELOG.md)
+- [Executed JupyterLab tutorial](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) - setup, three views, comparison, export, troubleshooting, and a one-minute demo recipe
+- [Static HTML tutorial preview](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) - the same tutorial with all visual reports rendered, no Jupyter required
+- [Runnable example notebook](https://github.com/ZiyuJiang07/recursionlens/blob/main/examples/demo.ipynb)
+- [User guide](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/USER.md)
+- [Developer guide](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/DEVELOPER.md)
+- [Changelog](https://github.com/ZiyuJiang07/recursionlens/blob/main/CHANGELOG.md)
 
 ## Development and testing
 
 ```bash
 python -m pytest tests -v
-python -m pip wheel . --no-deps
+python -m build
+python -m twine check dist/*
 ```
 
-The test suite covers trace invariants, cache behavior, signatures, exceptions, truncation, JSON, HTML escaping, DAG rendering, and comparison reports. Contributions should keep the public API and acceptance criteria synchronized with `SPEC.md`.
+The test suite covers trace invariants, cache behavior, signatures, exceptions, truncation, JSON, HTML escaping, DAG rendering, and comparison reports. Contributions should keep the public API, tests, and user documentation synchronized.
 
 ## License
 
-MIT © 2026 Ziyu Jiang and contributors
+MIT © 2026 Ziyu Jiang, Xinyue Cai, Kehan Cao, Ruoxi Lyu, Haobo Ma.
