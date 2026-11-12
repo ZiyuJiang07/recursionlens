@@ -218,8 +218,14 @@ def render_comparison(comparison) -> str:
         '<table class="rl-table"><thead><tr><th>Metric</th>'
         f'<th>{esc(comparison.labels[0])}</th><th>{esc(comparison.labels[1])}</th><th>Change</th>'
         '</tr></thead><tbody>' + "".join(rows) + '</tbody></table>'
-        '<div class="rl-columns"><div>' + report_header(left) + render_dag(left) + '</div>'
-        '<div>' + report_header(right) + render_dag(right) + '</div></div></section>'
+        f'<div class="rl-compare-block"><h3 class="rl-section">{esc(comparison.labels[0])}</h3>'
+        + report_header(left)
+        + render_dag(left)
+        + '</div>'
+        f'<div class="rl-compare-block"><h3 class="rl-section">{esc(comparison.labels[1])}</h3>'
+        + report_header(right)
+        + render_dag(right)
+        + '</div></section>'
     )
 
 
