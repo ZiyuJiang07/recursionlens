@@ -19,6 +19,7 @@ For `fib(5)`, that story is **15 observed calls → 6 unique subproblems → 6 e
 The existing `rcviz` package documents decorator-based recursion trees with arguments, return values, and Jupyter rendering. RecursionLens deliberately focuses on a different workflow:
 
 - transform one trace between an invocation tree and a compressed subproblem DAG;
+- show the complete call tree at once in an SVG view or keep a collapsible tree for larger runs;
 - quantify repeated calls, executed bodies, cache hits, and maximum depth;
 - compare naive and memoized runs in one report with side-by-side DAGs;
 - render self-contained HTML/SVG in JupyterLab without Graphviz, native libraries, external JavaScript, or a CDN;
@@ -61,6 +62,12 @@ Switch the same trace to the compressed subproblem DAG:
 
 ```python
 naive.show(mode="dag")
+```
+
+Or show every call at once as one compact SVG tree, with no nodes collapsed:
+
+```python
+naive.show(mode="expanded")
 ```
 
 Run the function again with memoization and compare the evidence:

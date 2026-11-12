@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import re
 from collections import defaultdict
 from typing import Dict, List, Tuple
 
@@ -8,7 +9,7 @@ from ._model import DAGNode
 
 _CSS = """
 .rl-wrap{--rl-blue:#185fa5;--rl-blue-bg:#e6f1fb;--rl-coral:#d85a30;--rl-coral-bg:#faece7;--rl-green:#0f6e56;--rl-green-bg:#e1f5ee;--rl-text:#242424;--rl-muted:#66645f;--rl-border:#dedcd5;color:var(--rl-text);background:#fff;border:1px solid var(--rl-border);border-radius:12px;padding:18px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;box-sizing:border-box;margin:8px 0;max-width:100%;overflow:auto}
-.rl-wrap *{box-sizing:border-box}.rl-title{font-size:18px;font-weight:600;margin:0 0 4px}.rl-subtitle{color:var(--rl-muted);font-size:13px;margin:0 0 16px}.rl-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:12px 0 18px}.rl-metric{background:#f6f5f1;border-radius:8px;padding:10px}.rl-metric-label{font-size:11px;color:var(--rl-muted)}.rl-metric-value{font-size:21px;font-weight:600;margin-top:2px}.rl-section{font-size:14px;font-weight:600;margin:18px 0 8px}.rl-tree,.rl-tree ul{list-style:none;padding-left:20px}.rl-tree{padding-left:0}.rl-tree details{margin:4px 0}.rl-tree summary{cursor:pointer;padding:5px 8px;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.rl-tree summary:hover{background:var(--rl-blue-bg)}.rl-result{color:var(--rl-muted);font-size:11px;margin-left:6px}.rl-badge{display:inline-block;border-radius:4px;padding:1px 5px;margin-left:5px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:10px;font-weight:500}.rl-repeat{color:#993c1d;background:var(--rl-coral-bg)}.rl-cached{color:var(--rl-green);background:var(--rl-green-bg)}.rl-error{color:#a32d2d;background:#fcebeb}.rl-warning{color:#854f0b;background:#faeeda;border-radius:6px;padding:8px;margin:8px 0;font-size:12px}.rl-dag{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-legend{font-size:11px;color:var(--rl-muted);margin:6px 0}.rl-table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0 16px}.rl-table th,.rl-table td{text-align:right;border-bottom:1px solid var(--rl-border);padding:8px}.rl-table th:first-child,.rl-table td:first-child{text-align:left}.rl-table th{color:var(--rl-muted);font-weight:500}.rl-delta-up{color:#a32d2d}.rl-delta-down{color:var(--rl-green)}.rl-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rl-note{font-size:12px;color:var(--rl-muted)}
+.rl-wrap *{box-sizing:border-box}.rl-title{font-size:18px;font-weight:600;margin:0 0 4px}.rl-subtitle{color:var(--rl-muted);font-size:13px;margin:0 0 16px}.rl-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:12px 0 18px}.rl-metric{background:#f6f5f1;border-radius:8px;padding:10px}.rl-metric-label{font-size:11px;color:var(--rl-muted)}.rl-metric-value{font-size:21px;font-weight:600;margin-top:2px}.rl-section{font-size:14px;font-weight:600;margin:18px 0 8px}.rl-tree,.rl-tree ul{list-style:none;padding-left:20px}.rl-tree{padding-left:0}.rl-tree details{margin:4px 0}.rl-tree summary{cursor:pointer;padding:5px 8px;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.rl-tree summary:hover{background:var(--rl-blue-bg)}.rl-result{color:var(--rl-muted);font-size:11px;margin-left:6px}.rl-badge{display:inline-block;border-radius:4px;padding:1px 5px;margin-left:5px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:10px;font-weight:500}.rl-repeat{color:#993c1d;background:var(--rl-coral-bg)}.rl-cached{color:var(--rl-green);background:var(--rl-green-bg)}.rl-error{color:#a32d2d;background:#fcebeb}.rl-warning{color:#854f0b;background:#faeeda;border-radius:6px;padding:8px;margin:8px 0;font-size:12px}.rl-dag{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-legend{font-size:11px;color:var(--rl-muted);margin:6px 0}.rl-table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0 16px}.rl-table th,.rl-table td{text-align:right;border-bottom:1px solid var(--rl-border);padding:8px}.rl-table th:first-child,.rl-table td:first-child{text-align:left}.rl-table th{color:var(--rl-muted);font-weight:500}.rl-delta-up{color:#a32d2d}.rl-delta-down{color:var(--rl-green)}.rl-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rl-note{font-size:12px;color:var(--rl-muted)}.rl-expanded{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-expanded svg{display:block;margin:auto}
 """
 
 
@@ -18,6 +19,17 @@ def esc(value: object) -> str:
 
 def short(value: str, limit: int = 34) -> str:
     return value if len(value) <= limit else value[: limit - 3] + "..."
+
+
+def compact_call(signature: str, limit: int = 18) -> str:
+    """Remove parameter names for the compact SVG tree while keeping values."""
+
+    if "(" not in signature or not signature.endswith(")"):
+        return short(signature, limit)
+    name, arguments = signature.split("(", 1)
+    arguments = arguments[:-1]
+    arguments = re.sub(r"(^|, )([A-Za-z_]\w*)=", r"\1", arguments)
+    return short(f"{name}({arguments})", limit)
 
 
 def metric_cards(report) -> str:
@@ -90,6 +102,119 @@ def render_tree(report) -> str:
         '<h3 class="rl-section">Call tree</h3>'
         '<div class="rl-legend">Each node is one invocation. Expand a node to inspect its children.</div>'
         f'<ul class="rl-tree">{roots}</ul>'
+    )
+
+
+def render_expanded_tree(report, limit: int = 120) -> str:
+    """Render every selected invocation as a compact, fully visible SVG tree."""
+
+    selected = []
+    child_lists = {}
+    remaining = [limit]
+
+    def collect(node) -> bool:
+        if remaining[0] <= 0:
+            return False
+        selected.append(node)
+        remaining[0] -= 1
+        child_lists[id(node)] = []
+        for child in node.children:
+            if collect(child):
+                child_lists[id(node)].append(child)
+        return True
+
+    for root in report.roots:
+        collect(root)
+
+    positions: Dict[int, Tuple[float, float]] = {}
+    leaf_cursor = [0]
+    maximum_depth = 0
+
+    def place(node, depth: int) -> None:
+        nonlocal maximum_depth
+        maximum_depth = max(maximum_depth, depth)
+        children = child_lists[id(node)]
+        if not children:
+            x = 80 + leaf_cursor[0] * 135
+            leaf_cursor[0] += 1
+        else:
+            for child in children:
+                place(child, depth + 1)
+            first_x = positions[id(children[0])][0]
+            last_x = positions[id(children[-1])][0]
+            x = (first_x + last_x) / 2
+        positions[id(node)] = (x, 24 + depth * 72)
+
+    for root in report.roots:
+        if id(root) in child_lists:
+            place(root, 0)
+
+    tree_width = 160 + max(0, leaf_cursor[0] - 1) * 135
+    width = max(600, tree_width)
+    horizontal_shift = (width - tree_width) / 2
+    if horizontal_shift:
+        positions = {
+            node_id: (x + horizontal_shift, y)
+            for node_id, (x, y) in positions.items()
+        }
+    height = max(110, 24 + maximum_depth * 72 + 56)
+    parts = [
+        f'<svg role="img" aria-label="Fully expanded recursion tree for {esc(report.function_name)}" '
+        f'viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+        'xmlns="http://www.w3.org/2000/svg">',
+        f"<title>{esc(report.function_name)} expanded call tree</title>",
+    ]
+
+    for parent in selected:
+        parent_x, parent_y = positions[id(parent)]
+        for child in child_lists[id(parent)]:
+            child_x, child_y = positions[id(child)]
+            parts.append(
+                f'<path class="rl-expanded-edge" d="M{parent_x},{parent_y + 28} '
+                f'L{child_x},{child_y + 6}" fill="none" stroke="#a9a7a0" stroke-width="1"/>'
+            )
+
+    for node in selected:
+        x, y = positions[id(node)]
+        note = [node.signature]
+        if node.cached:
+            note.append("cache hit")
+            color = "#0f6e56"
+            decoration = ""
+        elif node.status == "error":
+            note.append(node.error or "error")
+            color = "#a32d2d"
+            decoration = ""
+        elif node.repeated:
+            note.append("repeated")
+            color = "#993c1d"
+            decoration = ' text-decoration="underline"'
+        else:
+            color = "#242424"
+            decoration = ""
+        if node.result is not None:
+            note.append(f"returned {node.result}")
+        parts.extend(
+            [
+                f'<g class="rl-expanded-node"><title>{esc(" · ".join(note))}</title>',
+                f'<text x="{x}" y="{y + 17}" text-anchor="middle" '
+                f'font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" '
+                f'fill="{color}"{decoration}>{esc(compact_call(node.signature))}</text></g>',
+            ]
+        )
+    parts.append("</svg>")
+
+    omitted = report.recorded_calls - len(selected)
+    notice = (
+        f'<p class="rl-note">Showing the first {limit} calls; {omitted} omitted.</p>'
+        if omitted > 0
+        else ""
+    )
+    return (
+        '<h3 class="rl-section">Expanded call tree</h3>'
+        f'<div class="rl-legend">All {len(selected)} calls are visible. '
+        "Underlined coral = repeated; green = cache hit; red = error.</div>"
+        f'<div class="rl-expanded">{"".join(parts)}</div>{notice}'
     )
 
 
@@ -183,9 +308,10 @@ def render_dag(report) -> str:
 
 
 def render_report(report, mode: str = "tree") -> str:
-    if mode not in {"tree", "dag"}:
-        raise ValueError("mode must be 'tree' or 'dag'")
-    body = render_tree(report) if mode == "tree" else render_dag(report)
+    views = {"tree": render_tree, "dag": render_dag, "expanded": render_expanded_tree}
+    if mode not in views:
+        raise ValueError("mode must be 'tree', 'dag', or 'expanded'")
+    body = views[mode](report)
     return f'<style>{_CSS}</style><section class="rl-wrap">{report_header(report)}{body}</section>'
 
 

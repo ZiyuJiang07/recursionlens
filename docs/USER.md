@@ -40,9 +40,10 @@ def fib(n):
 naive = fib.run(5)
 naive.show(mode="tree")
 naive.show(mode="dag")
+naive.show(mode="expanded")
 ```
 
-The tree contains every recorded invocation. Repeated badges mark argument signatures seen before. The DAG merges all nodes with the same bound arguments, while retaining dependency edges and execution counts.
+The default tree is collapsible. `mode="expanded"` renders every recorded invocation at once as a compact SVG tree, with no nodes collapsed. Repeated calls are underlined coral, cache hits are green, and errors are red. The DAG merges all nodes with the same bound arguments, while retaining dependency edges and execution counts.
 
 ## Use case 3: measure the effect of memoization
 
@@ -65,6 +66,7 @@ Memoization is intended for deterministic functions with hashable arguments. Do 
 naive.export_json("trace.json")
 naive.export_html("tree.html")
 naive.export_html("dag.html", mode="dag")
+naive.export_html("expanded.html", mode="expanded")
 comparison.export_html("comparison.html")
 ```
 

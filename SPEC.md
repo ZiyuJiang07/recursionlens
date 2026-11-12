@@ -37,6 +37,7 @@ The supported teaching domain is deterministic, synchronous recursive functions.
 8. Reports display through `_repr_html_` in JupyterLab and contain no runtime dependency on Graphviz, external JavaScript, or a CDN.
 9. HTML output escapes source values and includes tree, DAG, metrics, and comparison views.
 10. JSON export contains nodes, DAG edges, metrics, and metadata with stable primitive types.
+11. Expanded mode renders every recorded call in one SVG tree with no collapsed nodes; a visible omission notice appears above 120 calls.
 
 ## Non-goals for 0.1
 

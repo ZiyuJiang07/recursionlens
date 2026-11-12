@@ -43,6 +43,29 @@ def test_memoized_dag_marks_cache_hits():
     assert "cached 1" in output
 
 
+def test_expanded_tree_shows_every_call_as_svg():
+    output = fib.run(4).to_html(mode="expanded")
+
+    assert "Expanded call tree" in output
+    assert "All 9 calls are visible" in output
+    assert output.count('<g class="rl-expanded-node">') == 9
+    assert output.count('class="rl-expanded-edge"') == 8
+    assert "<details" not in output
+    assert "Underlined coral = repeated" in output
+    assert ">fib(4)</text>" in output
+    assert "fib(n=4) · returned 3" in output
+    assert "https://" not in output
+    assert "<script" not in output
+
+
+def test_expanded_memoized_tree_marks_cache_hits():
+    output = fib.with_options(memoize=True).run(5).to_html(mode="expanded")
+
+    assert "All 9 calls are visible" in output
+    assert "cache hit" in output
+    assert "#0f6e56" in output
+
+
 def test_user_values_are_html_escaped():
     @trace
     def identity(value):

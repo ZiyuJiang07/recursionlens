@@ -23,6 +23,7 @@ assert naive.value == memoized.value == 5
 output = Path(__file__).parent
 naive.export_html(output / "fib-tree.html")
 naive.export_html(output / "fib-dag.html", mode="dag")
+naive.export_html(output / "fib-expanded.html", mode="expanded")
 naive.export_json(output / "fib-trace.json")
 comparison.export_html(output / "fib-comparison.html")
 
