@@ -37,7 +37,7 @@ def test_invalid_view_mode_is_rejected():
 
 
 def test_memoized_dag_marks_cache_hits():
-    output = fib.run(5, memoize=True).to_html(mode="dag")
+    output = fib.with_options(memoize=True).run(5).to_html(mode="dag")
 
     assert "cache hit" in output
     assert "cached 1" in output
@@ -66,7 +66,7 @@ def test_json_and_html_exports(tmp_path):
 
 def test_comparison_html_and_export(tmp_path):
     naive = fib.run(5)
-    memoized = fib.run(5, memoize=True)
+    memoized = fib.with_options(memoize=True).run(5)
     comparison = naive.compare(memoized)
     output = comparison._repr_html_()
 
@@ -81,6 +81,6 @@ def test_comparison_html_and_export(tmp_path):
 
 
 def test_truncated_report_explains_partial_metrics():
-    output = fib.run(5, max_calls=3).to_html()
+    output = fib.with_options(max_calls=3).run(5).to_html()
 
     assert "recording limit was reached" in output

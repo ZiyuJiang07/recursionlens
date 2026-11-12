@@ -14,7 +14,7 @@ RecursionLens turns a Python recursive function call into a JupyterLab-friendly 
 
 - A synchronous Python function decorated with `@trace`.
 - Positional or keyword arguments accepted by that function.
-- Optional `memoize` and `max_calls` settings for `function.run(...)`.
+- Optional `memoize` and `max_calls` settings for `function.with_options(...).run(...)`.
 
 The supported teaching domain is deterministic, synchronous recursive functions. Memoization additionally requires hashable bound arguments. Functions with external side effects are outside the correctness guarantee.
 

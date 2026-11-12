@@ -21,6 +21,7 @@ class TraceReport:
     memoize: bool = False
     truncated: bool = False
     warnings: List[str] = field(default_factory=list)
+    succeeded: bool = True
 
     @property
     def recorded_calls(self) -> int:
@@ -56,6 +57,12 @@ class TraceReport:
             return self.roots[0].result
         return None
 
+    @property
+    def error(self) -> Optional[str]:
+        if self.roots:
+            return self.roots[0].error
+        return None
+
     def metrics(self) -> Dict[str, Any]:
         return {
             "total_calls": self.total_calls,
@@ -67,6 +74,7 @@ class TraceReport:
             "max_depth": self.max_depth,
             "memoize": self.memoize,
             "truncated": self.truncated,
+            "succeeded": self.succeeded,
         }
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,6 +82,7 @@ class TraceReport:
             "schema_version": 1,
             "function_name": self.function_name,
             "result": self.result,
+            "error": self.error,
             "metrics": self.metrics(),
             "warnings": list(self.warnings),
             "roots": [root.to_dict() for root in self.roots],
@@ -131,6 +140,15 @@ class ComparisonReport:
     right: TraceReport
     labels: Tuple[str, str] = ("naive", "memoized")
 
+    @property
+    def same_result(self) -> bool:
+        if not self.left.succeeded or not self.right.succeeded:
+            return False
+        try:
+            return bool(self.left.value == self.right.value)
+        except Exception:
+            return False
+
     def to_dict(self) -> Dict[str, Any]:
         left_metrics = self.left.metrics()
         right_metrics = self.right.metrics()
@@ -147,6 +165,7 @@ class ComparisonReport:
             "left": left_metrics,
             "right": right_metrics,
             "delta": {key: right_metrics[key] - left_metrics[key] for key in keys},
+            "same_result": self.same_result,
         }
 
     def to_html(self) -> str:
@@ -164,10 +183,11 @@ class ComparisonReport:
     def _repr_html_(self) -> str:
         return self.to_html()
 
-    def show(self) -> None:
+    def show(self) -> Any:
+        html = self.to_html()
         try:
             from IPython.display import HTML, display
         except ImportError:
-            return None
-        display(HTML(self.to_html()))
+            return html
+        display(HTML(html))
         return None

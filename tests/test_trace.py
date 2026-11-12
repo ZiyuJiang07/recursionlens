@@ -31,7 +31,7 @@ def test_naive_fib_metrics_and_value():
 
 def test_memoized_fib_metrics_and_same_value():
     naive = fib.run(5)
-    memoized = fib.run(5, memoize=True)
+    memoized = fib.with_options(memoize=True).run(5)
 
     assert memoized.value == naive.value
     assert memoized.executed_calls == 6
@@ -90,7 +90,7 @@ def test_exception_is_recorded_and_reraised():
 
 def test_truncation_preserves_result():
     complete = fib.run(5)
-    limited = fib.run(5, max_calls=4)
+    limited = fib.with_options(max_calls=4).run(5)
 
     assert limited.value == complete.value
     assert limited.recorded_calls == 4
@@ -106,7 +106,7 @@ def test_unhashable_arguments_warn_instead_of_crashing():
         midpoint = len(items) // 2
         return length(items[:midpoint]) + length(items[midpoint:])
 
-    report = length.run([1, 2, 3], memoize=True)
+    report = length.with_options(memoize=True).run([1, 2, 3])
 
     assert report.value == 3
     assert report.warnings
@@ -123,7 +123,7 @@ def test_json_schema_contains_tree_dag_and_metrics():
 
 
 def test_comparison_deltas():
-    comparison = fib.run(5).compare(fib.run(5, memoize=True)).to_dict()
+    comparison = fib.run(5).compare(fib.with_options(memoize=True).run(5)).to_dict()
 
     assert comparison["left"]["executed_calls"] == 15
     assert comparison["right"]["executed_calls"] == 6

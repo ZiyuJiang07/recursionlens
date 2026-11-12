@@ -39,7 +39,10 @@ def metric_cards(report) -> str:
 
 def report_header(report) -> str:
     mode = "memoized" if report.memoize else "naive"
-    result = esc(report.result)
+    if report.succeeded:
+        outcome = f"returned <code>{esc(report.result)}</code>"
+    else:
+        outcome = f"raised <code>{esc(report.error)}</code>"
     warnings = "".join(
         f'<div class="rl-warning">{esc(message)}</div>' for message in report.warnings
     )
@@ -50,7 +53,7 @@ def report_header(report) -> str:
         )
     return (
         f'<h2 class="rl-title">RecursionLens · {esc(report.function_name)}</h2>'
-        f'<p class="rl-subtitle">{mode} run · returned <code>{result}</code></p>'
+        f'<p class="rl-subtitle">{mode} run · {outcome}</p>'
         + metric_cards(report)
         + warnings
     )
@@ -91,39 +94,43 @@ def render_tree(report) -> str:
 
 
 def dag_depths(nodes: List[DAGNode]) -> Dict[str, int]:
-    children = {node.signature: node.children for node in nodes}
+    children = {node.identity: node.children for node in nodes}
     known = set(children)
     memo: Dict[str, int] = {}
 
-    def depth(signature: str, visiting: set) -> int:
-        if signature in memo:
-            return memo[signature]
-        if signature in visiting:
+    def depth(identity: str, visiting: set) -> int:
+        if identity in memo:
+            return memo[identity]
+        if identity in visiting:
             return 0
-        next_nodes = [child for child in children.get(signature, []) if child in known]
-        value = 0 if not next_nodes else 1 + max(depth(child, visiting | {signature}) for child in next_nodes)
-        memo[signature] = value
+        next_nodes = [child for child in children.get(identity, []) if child in known]
+        value = 0 if not next_nodes else 1 + max(depth(child, visiting | {identity}) for child in next_nodes)
+        memo[identity] = value
         return value
 
-    return {node.signature: depth(node.signature, set()) for node in nodes}
+    return {node.identity: depth(node.identity, set()) for node in nodes}
 
 
 def render_dag(report) -> str:
     nodes = report.dag_nodes
     omitted = max(0, len(nodes) - 40)
     nodes = nodes[:40]
-    known = {node.signature for node in nodes}
+    known = {node.identity for node in nodes}
     depths = dag_depths(nodes)
     layers: Dict[int, List[DAGNode]] = defaultdict(list)
     for node in nodes:
-        layers[depths[node.signature]].append(node)
+        layers[depths[node.identity]].append(node)
 
     box_width, box_height = 190, 52
     horizontal_gap, vertical_gap = 235, 74
     positions: Dict[str, Tuple[float, float]] = {}
+    maximum_depth = max(layers, default=0)
     for depth, layer in layers.items():
         for index, node in enumerate(layer):
-            positions[node.signature] = (20 + depth * horizontal_gap, 30 + index * vertical_gap)
+            positions[node.identity] = (
+                20 + (maximum_depth - depth) * horizontal_gap,
+                30 + index * vertical_gap,
+            )
 
     width = max(600, 40 + (max(layers, default=0) + 1) * horizontal_gap)
     height = max(130, 60 + max((len(layer) for layer in layers.values()), default=1) * vertical_gap)
@@ -143,12 +150,12 @@ def render_dag(report) -> str:
         sx, sy = positions[source]
         tx, ty = positions[target]
         parts.append(
-            f'<path d="M{sx + box_width},{sy + box_height / 2} L{tx},{ty + box_height / 2}" '
+            f'<path d="M{sx + box_width},{sy + box_height / 2} L{tx - 8},{ty + box_height / 2}" '
             'fill="none" stroke="#888780" stroke-width="1" marker-end="url(#rl-arrow)"/>'
         )
 
     for node in nodes:
-        x, y = positions[node.signature]
+        x, y = positions[node.identity]
         if node.cached:
             fill, stroke, text = "#e1f5ee", "#0f6e56", "#085041"
         elif node.calls > 1:
@@ -203,7 +210,7 @@ def render_comparison(comparison) -> str:
             f"<td>{right_metrics[key]}</td><td class=\"{delta_class}\">{delta_text}</td></tr>"
         )
 
-    same_result = "yes" if left.result == right.result else "no"
+    same_result = "yes" if comparison.same_result else "no"
     return (
         f'<style>{_CSS}</style><section class="rl-wrap">'
         '<h2 class="rl-title">RecursionLens · execution comparison</h2>'
