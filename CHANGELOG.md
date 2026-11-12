@@ -7,6 +7,7 @@
 - `report.show(mode="expanded")` renders every recorded invocation as one compact SVG tree, with no nodes collapsed.
 - Repeated calls are underlined coral, cache hits are green, and errors are red.
 - Expanded mode is capped at 120 visible calls with an explicit omission notice.
+- Added a pre-executed JupyterLab tutorial with saved tree, expanded-tree, DAG, and comparison outputs, setup guidance, troubleshooting, and a one-minute demo recipe.
 
 ## 0.1.0 — 2026-11-12
 

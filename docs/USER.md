@@ -1,5 +1,7 @@
 # RecursionLens user guide
 
+> New to JupyterLab? Open the [pre-rendered tutorial](RecursionLens_Tutorial.ipynb). Its trees and DAGs are visible immediately, and it includes a one-minute demo recipe.
+
 ## Use case 1: understand a recursive call
 
 Decorate a synchronous function with `@trace`. A normal call returns the original value and stores its latest report:

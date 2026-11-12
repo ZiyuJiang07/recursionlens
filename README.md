@@ -4,6 +4,8 @@
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 
+> **JupyterLab tutorial, already rendered:** [Open RecursionLens_Tutorial.ipynb](docs/RecursionLens_Tutorial.ipynb). Every code cell has saved output, so the collapsible tree, expanded SVG tree, DAG, and comparison are visible without running anything.
+
 ## Why RecursionLens?
 
 A recursive function normally exposes only its final return value or traceback. Students still have to reconstruct the execution in their heads. RecursionLens answers three different questions:
@@ -110,7 +112,8 @@ Version 0.1 targets synchronous, deterministic teaching examples such as factori
 
 ## Documentation and demo
 
-- [Runnable Jupyter notebook](examples/demo.ipynb)
+- [Pre-rendered JupyterLab tutorial](docs/RecursionLens_Tutorial.ipynb) - setup, three views, comparison, export, troubleshooting, and a one-minute demo recipe
+- [Runnable example notebook](examples/demo.ipynb)
 - [User guide](docs/USER.md)
 - [Developer guide](docs/DEVELOPER.md)
 - [Specification and acceptance criteria](SPEC.md)
