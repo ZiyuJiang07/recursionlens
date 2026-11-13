@@ -391,9 +391,11 @@ class TutorPlayer:
             self._render_message()
             return
         step = self.trace.step(self.index)
+        tag = "" if step.event == "line" else f" · {step.label}"
+        detail = f" · {step.value}" if step.event == "return" and step.value else ""
         self.status.value = (
             f'<div class="rl-tutor-step">step {step.index + 1} / {self.trace.step_count} · '
-            f"{step.label} · {step.function} · line {step.line}</div>"
+            f"{step.function} · line {step.line}{tag}{detail}</div>"
         )
         self._render_code_with_highlight(step.line, [frame.line for frame in step.frames])
         self._render_stack(step)
