@@ -9,6 +9,7 @@ The optional widget in :func:`tutor` only renders those steps.
 from __future__ import annotations
 
 import contextlib
+import html
 import io
 import sys
 from dataclasses import dataclass, field
@@ -23,6 +24,10 @@ DEFAULT_CODE = """def fib(n):
 DEFAULT_CALL = "fib(5)"
 MAX_STEPS = 4000
 MAX_LOCAL_CHARS = 80
+
+
+def esc(value: object) -> str:
+    return html.escape(str(value), quote=True)
 
 
 @dataclass
@@ -122,6 +127,145 @@ def _snapshot(frame) -> List[TutorFrame]:
         current = current.f_back
     stack.reverse()
     return stack
+
+
+@dataclass
+class _TutorNode:
+    """One invocation in the call tree built from a recorded trace."""
+
+    id: int
+    parent: Optional[int]
+    label: str
+    line: int
+    status: str = "running"
+    value: Optional[str] = None
+    children: List[int] = field(default_factory=list)
+
+
+def _frame_label(frame: TutorFrame) -> str:
+    args = [value for name, value in frame.variables.items() if not name.startswith("_")][:2]
+    text = f"{frame.function}({', '.join(args)})" if args else f"{frame.function}()"
+    return text if len(text) <= 20 else text[:17] + "..."
+
+
+def build_tutor_tree(steps: List[TutorStep], upto: int):
+    """Replay the recorded events up to ``upto`` and return the tree seen so far."""
+
+    nodes: List[_TutorNode] = []
+    stack: List[int] = []
+    pending_pop = False
+    for step in steps[: upto + 1]:
+        if pending_pop:
+            if stack:
+                stack.pop()
+            pending_pop = False
+        if step.event == "call" and step.frames:
+            node = _TutorNode(
+                id=len(nodes),
+                parent=stack[-1] if stack else None,
+                label=_frame_label(step.frames[-1]),
+                line=step.line,
+            )
+            if node.parent is not None:
+                nodes[node.parent].children.append(node.id)
+            nodes.append(node)
+            stack.append(node.id)
+        elif step.event in ("return", "exception"):
+            if stack:
+                node = nodes[stack[-1]]
+                node.status = "returned" if step.event == "return" else "error"
+                node.value = step.value
+                node.line = step.line
+                pending_pop = True
+        elif step.event == "line" and stack:
+            nodes[stack[-1]].line = step.line
+    return nodes, stack
+
+
+def render_tutor_tree(nodes: List[_TutorNode], running: List[int]) -> str:
+    """Render the invocations recorded so far as a compact SVG tree."""
+
+    if not nodes:
+        return ""
+    by_id = {node.id: node for node in nodes}
+    widths = {
+        node.id: max(54.0, min(136.0, len(node.label) * 5.9 + 18)) for node in nodes
+    }
+    positions: Dict[int, Tuple[float, float]] = {}
+    cursor = [0.0]
+    gap, level = 16.0, 52.0
+    node_height = 26.0
+
+    def place(nid: int, depth: int) -> None:
+        node = by_id[nid]
+        kids = [child for child in node.children if child in by_id]
+        if not kids:
+            x = cursor[0] + widths[nid] / 2
+            cursor[0] = x + widths[nid] / 2 + gap
+        else:
+            for kid in kids:
+                place(kid, depth + 1)
+            x = (positions[kids[0]][0] + positions[kids[-1]][0]) / 2
+        positions[nid] = (x, 22 + depth * level)
+
+    roots = [node.id for node in nodes if node.parent is None or node.parent not in by_id]
+    for root in roots:
+        place(root, 0)
+
+    content = max(0.0, cursor[0] - gap)
+    width = max(380.0, content + 28)
+    shift = (width - content) / 2
+    if shift:
+        positions = {nid: (x + shift, y) for nid, (x, y) in positions.items()}
+    depth_max = max((y for _, y in positions.values()), default=22)
+    height = depth_max + node_height + 22
+
+    current = running[-1] if running else None
+    parts = [
+        f'<svg role="img" aria-label="Call tree of the recorded run" viewBox="0 0 {width:.0f} {height:.0f}" '
+        f'width="{width:.0f}" height="{height:.0f}" xmlns="http://www.w3.org/2000/svg">'
+    ]
+
+    for node in nodes:
+        px, py = positions[node.id]
+        for child in node.children:
+            if child not in by_id:
+                continue
+            cx, cy = positions[child]
+            start, end = py + node_height / 2, cy - node_height / 2
+            middle = (start + end) / 2
+            parts.append(
+                f'<path d="M{px:.1f},{start:.1f} C{px:.1f},{middle:.1f} {cx:.1f},{middle:.1f} '
+                f'{cx:.1f},{end:.1f}" fill="none" stroke="#cfccc3" stroke-width="1"/>'
+            )
+
+    for node in nodes:
+        x, y = positions[node.id]
+        if node.id == current:
+            if node.status == "error":
+                fill, stroke, ink = "#fdecec", "#a32d2d", "#a32d2d"
+            elif node.status == "returned":
+                fill, stroke, ink = "#eaf6f0", "#d85a30", "#0b5c48"
+            else:
+                fill, stroke, ink = "#fdf1ec", "#d85a30", "#993c1d"
+        elif node.status == "error":
+            fill, stroke, ink = "#fdecec", "#e3a6a6", "#a32d2d"
+        elif node.status == "returned":
+            fill, stroke, ink = "#eaf6f0", "#a9cdbf", "#0b5c48"
+        else:
+            fill, stroke, ink = "#ffffff", "#c3d4e6", "#185fa5"
+        left = x - widths[node.id] / 2
+        parts.append(
+            f'<g><title>{esc(node.label)} · line {node.line}'
+            f'{" · " + node.value if node.value else ""}</title>'
+            f'<rect x="{left:.1f}" y="{y - node_height / 2:.1f}" width="{widths[node.id]:.1f}" '
+            f'height="{node_height:.1f}" rx="7" fill="{fill}" stroke="{stroke}" stroke-width="1"/>'
+            f'<text x="{x:.1f}" y="{y + 3.9:.1f}" text-anchor="middle" '
+            'font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11" '
+            f'fill="{ink}">{esc(node.label)}</text></g>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
 
 
 def record_tutor(code: str, call: Optional[str] = None, max_steps: int = MAX_STEPS) -> TutorTrace:
@@ -251,11 +395,10 @@ _CSS = """
 .rl-tutor-code .ln.cur{background:#fdf1ec;box-shadow:inset 3px 0 0 #d85a30}
 .rl-tutor-code .n{color:#b3b0a6;text-align:right;min-width:22px;user-select:none}
 .rl-tutor-code .t{white-space:pre}
-.rl-tutor-stack{display:flex;flex-direction:column;max-height:340px;overflow:auto;padding:2px}
-.rl-stack-node{position:relative;display:flex;flex-direction:column}
-.rl-stack-children{margin-left:10px;padding-left:16px;margin-top:8px;display:flex;flex-direction:column}
-.rl-stack-children > .rl-stack-node::before{content:"";position:absolute;left:-16px;top:-8px;width:16px;height:31px;border-left:1px solid #ddd9cd;border-bottom:1px solid #ddd9cd;border-bottom-left-radius:9px}
-.rl-tutor-frame{border:1px solid #e2dfd6;border-radius:10px;padding:8px 11px;background:#fff}
+.rl-tutor-tree{max-height:380px;overflow:auto;padding:4px;background:#fbfaf6;border:1px solid #efede5;border-radius:10px}
+.rl-tutor-tree svg{display:block;max-width:100%;height:auto}
+.rl-tutor-legend{font-size:11px;color:#8a877d;margin:0 0 4px}
+.rl-tutor-frame{border:1px solid #e2dfd6;border-radius:10px;padding:8px 11px;background:#fff;max-width:420px}
 .rl-tutor-frame.cur{border-color:#d85a30;background:#fffaf7}
 .rl-tutor-head{font-size:12px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
 .rl-tutor-head span{font-weight:400;color:#8a877d}
@@ -336,7 +479,7 @@ class TutorPlayer:
             layout=widgets.Layout(width="100%"),
         )
         self._render_code()
-        self._render_stack(None)
+        self._render_tree(None)
         self.run()
 
     # -- state ---------------------------------------------------------
@@ -390,7 +533,7 @@ class TutorPlayer:
     def _render_step(self) -> None:
         if not self.trace or not self.trace.steps:
             self.status.value = '<div class="rl-tutor-step">no steps to show</div>'
-            self._render_stack(None)
+            self._render_tree(None)
             self._render_message()
             return
         step = self.trace.step(self.index)
@@ -401,7 +544,7 @@ class TutorPlayer:
             f"{step.function} · line {step.line}{tag}{detail}</div>"
         )
         self._render_code_with_highlight(step.line, [frame.line for frame in step.frames])
-        self._render_stack(step)
+        self._render_tree(step)
         self._render_message()
         self.output_html.value = (
             f'<pre class="rl-tutor-out">{step.output}</pre>' if step.output.strip() else ""
@@ -422,33 +565,41 @@ class TutorPlayer:
             )
         self.code_html.value = f'<pre class="rl-tutor-code">{"".join(rows)}</pre>'
 
-    def _render_stack(self, step: Optional[TutorStep]) -> None:
-        if step is None or not step.frames:
-            self.stack_html.value = '<div class="rl-tutor-empty">No active frames</div>'
+    def _render_tree(self, step: Optional[TutorStep]) -> None:
+        legend = (
+            '<div class="rl-tutor-legend">coral = current · blue = waiting · '
+            'green = returned</div>'
+        )
+        if step is None or not self.trace or not self.trace.steps:
+            self.stack_html.value = (
+                legend
+                + '<div class="rl-tutor-tree"><div class="rl-tutor-empty">'
+                "Step through a run to grow the call tree</div></div>"
+            )
             return
 
-        def branch(depth: int) -> str:
-            frame = step.frames[depth]
-            current = depth == len(step.frames) - 1
+        nodes, running = build_tutor_tree(self.trace.steps, self.index)
+        svg = render_tutor_tree(nodes, running)
+
+        card = ""
+        if step.frames:
+            frame = step.frames[-1]
             variables = "".join(
                 f'<span class="k">{name}</span><span class="v">{value}</span>'
                 for name, value in frame.variables.items()
             )
             if not variables:
                 variables = '<span class="v">(no locals)</span>'
-            badge = "current" if current else f"depth {depth + 1}"
             card = (
-                f'<div class="rl-tutor-frame{" cur" if current else ""}">'
+                '<div class="rl-tutor-frame cur">'
                 f'<div class="rl-tutor-head">{frame.function}'
-                f"<span>{badge} · line {frame.line}</span></div>"
+                f"<span>current · line {frame.line}</span></div>"
                 f'<div class="rl-tutor-vars">{variables}</div></div>'
             )
-            children = ""
-            if depth + 1 < len(step.frames):
-                children = f'<div class="rl-stack-children">{branch(depth + 1)}</div>'
-            return f'<div class="rl-stack-node">{card}{children}</div>'
 
-        self.stack_html.value = f'<div class="rl-tutor-stack">{branch(0)}</div>'
+        self.stack_html.value = (
+            f'{legend}<div class="rl-tutor-tree">{svg}</div>{card}'
+        )
 
     def _render_message(self) -> None:
         if not self.trace:

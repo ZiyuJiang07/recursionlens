@@ -115,7 +115,7 @@ from recursionlens import tutor
 tutor()   # editable code panel, an input box for the call, and step controls
 ```
 
-The player highlights the current line, shows every stack frame with its local variables, and lets you change the call (for example `fib(5)` → `fib(3)`) to record a fresh run and redraw. It reports each call, line, return, and exception, which makes the order of a recursion easy to follow.
+The player highlights the current line and grows the call tree as the run proceeds: waiting calls are blue, the call being executed is coral, and returned calls stay on screen in green. The current frame's local variables sit under the tree, and changing the call (for example `fib(5)` → `fib(3)`) records a fresh run and redraws from a single node. It reports each call, line, return, and exception, which makes the order of a recursion easy to follow.
 
 The tutor runs the code you paste with normal Python semantics; it is not a sandbox.
 

@@ -148,3 +148,27 @@ def test_widget_reruns_with_a_new_input_value():
     player.run(call="fib(3)")
     assert player.trace.step_count == 20
     assert player.slider.max == 19
+
+def test_call_tree_grows_with_each_step():
+    pytest.importorskip("ipywidgets")
+    player = tutor()
+
+    player.go(0)
+    assert player.stack_html.value.count("<rect") == 1
+
+    player.go(3)
+    assert player.stack_html.value.count("<rect") == 2
+
+    player.go(59)
+    assert player.stack_html.value.count("<rect") == 15
+
+
+def test_returned_calls_stay_in_the_tree_with_their_own_colour():
+    pytest.importorskip("ipywidgets")
+    player = tutor()
+    player.go(20)
+
+    html = player.stack_html.value
+    assert "#eaf6f0" in html          # returned nodes keep a green card
+    assert "#d85a30" in html          # the current node is still marked
+    assert "coral = current" in html
