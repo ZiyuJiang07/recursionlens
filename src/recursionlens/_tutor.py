@@ -251,8 +251,11 @@ _CSS = """
 .rl-tutor-code .ln.cur{background:#fdf1ec;box-shadow:inset 3px 0 0 #d85a30}
 .rl-tutor-code .n{color:#b3b0a6;text-align:right;min-width:22px;user-select:none}
 .rl-tutor-code .t{white-space:pre}
-.rl-tutor-stack{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto;padding:2px}
-.rl-tutor-frame{border:1px solid #e2dfd6;border-radius:10px;padding:10px 12px;background:#fff}
+.rl-tutor-stack{display:flex;flex-direction:column;max-height:340px;overflow:auto;padding:2px}
+.rl-stack-node{position:relative;display:flex;flex-direction:column}
+.rl-stack-children{margin-left:10px;padding-left:16px;border-left:1px solid #ddd9cd;margin-top:8px;display:flex;flex-direction:column}
+.rl-stack-children > .rl-stack-node::before{content:"";position:absolute;left:-17px;top:23px;width:15px;border-top:1px solid #ddd9cd}
+.rl-tutor-frame{border:1px solid #e2dfd6;border-radius:10px;padding:8px 11px;background:#fff}
 .rl-tutor-frame.cur{border-color:#d85a30;background:#fffaf7}
 .rl-tutor-head{font-size:12px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
 .rl-tutor-head span{font-weight:400;color:#8a877d}
@@ -423,22 +426,29 @@ class TutorPlayer:
         if step is None or not step.frames:
             self.stack_html.value = '<div class="rl-tutor-empty">No active frames</div>'
             return
-        cards = []
-        for position, frame in enumerate(step.frames):
-            current = position == len(step.frames) - 1
+
+        def branch(depth: int) -> str:
+            frame = step.frames[depth]
+            current = depth == len(step.frames) - 1
             variables = "".join(
                 f'<span class="k">{name}</span><span class="v">{value}</span>'
                 for name, value in frame.variables.items()
             )
             if not variables:
                 variables = '<span class="v">(no locals)</span>'
-            badge = "current" if current else f"depth {position + 1}"
-            cards.append(
+            badge = "current" if current else f"depth {depth + 1}"
+            card = (
                 f'<div class="rl-tutor-frame{" cur" if current else ""}">'
-                f'<div class="rl-tutor-head">{frame.function}<span>{badge} · line {frame.line}</span></div>'
+                f'<div class="rl-tutor-head">{frame.function}'
+                f"<span>{badge} · line {frame.line}</span></div>"
                 f'<div class="rl-tutor-vars">{variables}</div></div>'
             )
-        self.stack_html.value = f'<div class="rl-tutor-stack">{"".join(cards)}</div>'
+            children = ""
+            if depth + 1 < len(step.frames):
+                children = f'<div class="rl-stack-children">{branch(depth + 1)}</div>'
+            return f'<div class="rl-stack-node">{card}{children}</div>'
+
+        self.stack_html.value = f'<div class="rl-tutor-stack">{branch(0)}</div>'
 
     def _render_message(self) -> None:
         if not self.trace:
