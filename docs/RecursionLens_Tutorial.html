@@ -8467,6 +8467,35 @@ result: 3
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-playground">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Playground-%E2%80%94-open-the-player">Playground — open the player<a class="anchor-link" href="#Playground-%E2%80%94-open-the-player">¶</a></h2><p>▶ Run the next cell (Shift+Enter). The player is an interactive widget, so it cannot be saved into a notebook or exported to HTML. Run the next cell in a live kernel to open it, then edit the code, change <code>Input</code>, and step with the buttons or the slider.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_skip-execution" id="cell-id=code-playground">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">recursionlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">tutor</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"ipywidgets"</span><span class="p">,</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="n">tutor</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ma-25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8575,33 +8604,6 @@ result: 3
 </tbody>
 </table>
 <p>Two limits worth knowing: memoization needs hashable arguments (otherwise a warning is recorded and those calls are not cached), and RecursionLens executes your function — it is not a sandbox.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-playground">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Playground-%E2%80%94-open-the-player">Playground — open the player<a class="anchor-link" href="#Playground-%E2%80%94-open-the-player">¶</a></h2><p>The player is an interactive widget, so it cannot be saved into a notebook or exported to HTML. Run the next cell in a live kernel to open it, then edit the code, change <code>Input</code>, and step with the buttons or the slider.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs celltag_skip-execution" id="cell-id=code-playground">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">recursionlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">tutor</span>
-
-<span class="n">tutor</span><span class="p">()</span>
-</pre></div>
-</div>
 </div>
 </div>
 </div>
