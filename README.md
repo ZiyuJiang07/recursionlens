@@ -129,9 +129,6 @@ Version 0.1 targets synchronous, deterministic teaching examples such as factori
 - [Executed JupyterLab tutorial](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) - setup, three views, comparison, export, troubleshooting, and a one-minute demo recipe
 - [Static HTML tutorial preview](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) - the same tutorial with all visual reports rendered, no Jupyter required
 - [Runnable example notebook](https://github.com/ZiyuJiang07/recursionlens/blob/main/examples/demo.ipynb)
-- [User guide](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/USER.md)
-- [Developer guide](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/DEVELOPER.md)
-- [Changelog](https://github.com/ZiyuJiang07/recursionlens/blob/main/CHANGELOG.md)
 
 ## Development and testing
 
@@ -141,7 +138,7 @@ python -m build
 python -m twine check dist/*
 ```
 
-The test suite covers trace invariants, cache behavior, signatures, exceptions, truncation, JSON, HTML escaping, DAG rendering, and comparison reports. Contributions should keep the public API, tests, and user documentation synchronized.
+The test suite covers trace invariants, cache behavior, signatures, exceptions, truncation, JSON, HTML escaping, DAG rendering, and comparison reports. Contributions should keep the public API, tests, and README synchronized.
 
 ## License
 

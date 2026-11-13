@@ -129,9 +129,6 @@ HTML 报告是独立文件，不需要 notebook 服务器就能打开。JSON 包
 - [已执行的 JupyterLab 教程](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) — 安装、三种视图、对比、导出、排错，以及一分钟演示脚本
 - [静态 HTML 教程预览](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) — 同一份教程，所有可视化报告已渲染，不需要 Jupyter
 - [可直接运行的示例 notebook](https://github.com/ZiyuJiang07/recursionlens/blob/main/examples/demo.ipynb)
-- [用户指南](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/USER.md)
-- [开发者指南](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/DEVELOPER.md)
-- [更新日志](https://github.com/ZiyuJiang07/recursionlens/blob/main/CHANGELOG.md)
 
 ## 开发与测试
 
@@ -141,7 +138,7 @@ python -m build
 python -m twine check dist/*
 ```
 
-测试覆盖 trace 不变量、缓存行为、签名、异常、截断、JSON、HTML 转义、DAG 渲染与对比报告。贡献时应保持公共 API、测试与用户文档同步。
+测试覆盖 trace 不变量、缓存行为、签名、异常、截断、JSON、HTML 转义、DAG 渲染与对比报告。贡献时应保持公共 API、测试与 README 同步。
 
 ## 许可证
 

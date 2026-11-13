@@ -11,11 +11,11 @@ requires-python = ">=3.9"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-  { name = "Ziyu Jiang" },
-  { name = "Xinyue Cai" },
-  { name = "Kehan Cao" },
-  { name = "Ruoxi Lyu" },
-  { name = "Haobo Ma" },
+  { name = "Ziyu JIANG" },
+  { name = "Xinyue CAI" },
+  { name = "Kehan CAO" },
+  { name = "Ruoxi LYU" },
+  { name = "Haobo MA" },
 ]
 keywords = ["recursion", "jupyterlab", "visualization", "memoization", "education"]
 classifiers = [
@@ -29,9 +29,8 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/ZiyuJiang07/recursionlens"
 Repository = "https://github.com/ZiyuJiang07/recursionlens"
-Documentation = "https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/USER.md"
+Documentation = "https://github.com/ZiyuJiang07/recursionlens#readme"
 Tutorial = "https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb"
-Changelog = "https://github.com/ZiyuJiang07/recursionlens/blob/main/CHANGELOG.md"
 Issues = "https://github.com/ZiyuJiang07/recursionlens/issues"
 
 [project.optional-dependencies]
