@@ -40,5 +40,33 @@ window.RL_EXAMPLES = [
     "call": "quicksort([3, 1, 2, 5, 4])",
     "note": "",
     "code": "import random\n\ndef quicksort(seq):\n    \"\"\"Return a sorted list of items from seq.\"\"\"\n    if len(seq) <= 1:\n        return list(seq)\n    i = random.randint(0, len(seq) - 1)\n    pivot, others = seq[i], [*seq[:i], *seq[i + 1:]]\n    left = quicksort([x for x in others if x < pivot])\n    right = quicksort([x for x in others if x >= pivot])\n    return [*left, pivot, *right]\n"
+  },
+  {
+    "lecture": "Lecture R · Exercises",
+    "name": "merge (sorted lists)",
+    "call": "merge([1, 3, 5], [2, 4, 6])",
+    "note": "both inputs must already be sorted",
+    "code": "def merge(left, right):\n    if left and right:\n        if left[-1] > right[-1]:\n            left, right = right, left\n        return merge(left, right[:-1]) + [right[-1]]\n    return list(left or right)\n"
+  },
+  {
+    "lecture": "Lecture R · Exercises",
+    "name": "mergesort",
+    "call": "mergesort([3, 1, 4, 1, 5, 9, 2, 6])",
+    "note": "divide and conquer: sort each half, then merge",
+    "code": "def merge(left, right):\n    if left and right:\n        if left[-1] > right[-1]:\n            left, right = right, left\n        return merge(left, right[:-1]) + [right[-1]]\n    return list(left or right)\n\n\ndef mergesort(seq):\n    if len(seq) <= 1:\n        return list(seq)\n    i = len(seq) // 2\n    return merge(mergesort(seq[:i]), mergesort(seq[i:]))\n"
+  },
+  {
+    "lecture": "Lecture R · Exercises",
+    "name": "combination (subsets)",
+    "call": "combination(3, 2)",
+    "note": "two recursive branches per level",
+    "code": "def combination(n, k):\n    output = []\n    if 0 <= k <= n:\n        if k == 0:\n            output.append(set())\n        else:\n            output.extend(combination(n - 1, k))\n            output.extend({*s, n - 1} for s in combination(n - 1, k - 1))\n    return output\n"
+  },
+  {
+    "lecture": "Lecture R · Exercises",
+    "name": "integer sqrt (def _)",
+    "call": "_(10, 0, 10)",
+    "note": "binary search on the interval [a, b)",
+    "code": "def _(n, a, b):\n    if a ** 2 <= n < b ** 2:\n        if a + 1 == b:\n            return a\n        c = (a + b) // 2\n        return _(n, a, c) or _(n, c, b)\n"
   }
 ];
