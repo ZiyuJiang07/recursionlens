@@ -28,6 +28,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/ZiyuJiang07/recursionlens"
+Website = "https://ziyujiang07.github.io/recursionlens/"
 Repository = "https://github.com/ZiyuJiang07/recursionlens"
 Documentation = "https://github.com/ZiyuJiang07/recursionlens#readme"
 Tutorial = "https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb"
