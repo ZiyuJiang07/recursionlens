@@ -9,7 +9,7 @@ from ._model import DAGNode
 
 _CSS = """
 .rl-wrap{--rl-blue:#185fa5;--rl-blue-bg:#e6f1fb;--rl-coral:#d85a30;--rl-coral-bg:#faece7;--rl-green:#0f6e56;--rl-green-bg:#e1f5ee;--rl-text:#242424;--rl-muted:#66645f;--rl-border:#dedcd5;color:var(--rl-text);background:#fff;border:1px solid var(--rl-border);border-radius:12px;padding:18px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;box-sizing:border-box;margin:8px 0;max-width:100%;overflow:auto}
-.rl-wrap *{box-sizing:border-box}.rl-title{font-size:18px;font-weight:600;margin:0 0 4px}.rl-subtitle{color:var(--rl-muted);font-size:13px;margin:0 0 16px}.rl-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:12px 0 18px}.rl-metric{background:#f6f5f1;border-radius:8px;padding:10px}.rl-metric-label{font-size:11px;color:var(--rl-muted)}.rl-metric-value{font-size:21px;font-weight:600;margin-top:2px}.rl-section{font-size:14px;font-weight:600;margin:18px 0 8px}.rl-tree,.rl-tree ul{list-style:none;padding-left:20px}.rl-tree{padding-left:0}.rl-tree details{margin:4px 0}.rl-tree summary{cursor:pointer;padding:5px 8px;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.rl-tree summary:hover{background:var(--rl-blue-bg)}.rl-result{color:var(--rl-muted);font-size:11px;margin-left:6px}.rl-badge{display:inline-block;border-radius:4px;padding:1px 5px;margin-left:5px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:10px;font-weight:500}.rl-repeat{color:#993c1d;background:var(--rl-coral-bg)}.rl-cached{color:var(--rl-green);background:var(--rl-green-bg)}.rl-error{color:#a32d2d;background:#fcebeb}.rl-warning{color:#854f0b;background:#faeeda;border-radius:6px;padding:8px;margin:8px 0;font-size:12px}.rl-dag{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-legend{font-size:11px;color:var(--rl-muted);margin:6px 0}.rl-table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0 16px}.rl-table th,.rl-table td{text-align:right;border-bottom:1px solid var(--rl-border);padding:8px}.rl-table th:first-child,.rl-table td:first-child{text-align:left}.rl-table th{color:var(--rl-muted);font-weight:500}.rl-delta-up{color:#a32d2d}.rl-delta-down{color:var(--rl-green)}.rl-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rl-note{font-size:12px;color:var(--rl-muted)}.rl-expanded{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-expanded svg{display:block;margin:auto}
+.rl-wrap *{box-sizing:border-box}.rl-title{font-size:18px;font-weight:600;margin:0 0 4px}.rl-subtitle{color:var(--rl-muted);font-size:13px;margin:0 0 16px}.rl-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:12px 0 18px}.rl-metric{background:#f6f5f1;border-radius:8px;padding:10px}.rl-metric-label{font-size:11px;color:var(--rl-muted)}.rl-metric-value{font-size:21px;font-weight:600;margin-top:2px}.rl-section{font-size:14px;font-weight:600;margin:18px 0 8px}.rl-tree,.rl-tree ul{list-style:none;padding-left:18px}.rl-tree{padding-left:0}.rl-tree ul{border-left:1px solid #eae7de;margin-left:8px}.rl-tree details{margin:2px 0}.rl-tree summary{cursor:pointer;padding:6px 9px;border-radius:7px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#2b2a26}.rl-tree summary:hover{background:#f4f2ec}.rl-result{color:var(--rl-muted);font-size:11px;margin-left:6px}.rl-badge{display:inline-block;border-radius:4px;padding:1px 5px;margin-left:5px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:10px;font-weight:500}.rl-repeat{color:#993c1d;background:var(--rl-coral-bg)}.rl-cached{color:var(--rl-green);background:var(--rl-green-bg)}.rl-error{color:#a32d2d;background:#fcebeb}.rl-warning{color:#854f0b;background:#faeeda;border-radius:6px;padding:8px;margin:8px 0;font-size:12px}.rl-dag{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-legend{font-size:11px;color:var(--rl-muted);margin:6px 0}.rl-table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0 16px}.rl-table th,.rl-table td{text-align:right;border-bottom:1px solid var(--rl-border);padding:8px}.rl-table th:first-child,.rl-table td:first-child{text-align:left}.rl-table th{color:var(--rl-muted);font-weight:500}.rl-delta-up{color:#a32d2d}.rl-delta-down{color:var(--rl-green)}.rl-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rl-note{font-size:12px;color:var(--rl-muted)}.rl-expanded{max-width:100%;overflow:auto;background:#fbfaf6;border:1px solid #efede5;border-radius:10px;padding:12px}.rl-expanded svg{display:block;margin:auto}
 """
 
 
@@ -105,6 +105,24 @@ def render_tree(report) -> str:
     )
 
 
+def _mono_width(text: str, size: float = 12.0) -> float:
+    """Approximate the advance width of monospace text at a given size."""
+
+    return len(text) * size * 0.6
+
+
+def _node_style(node) -> Tuple[str, str, str, str, str]:
+    """Return fill, stroke, dot colour, label colour, and dash pattern."""
+
+    if node.cached:
+        return "#eaf6f0", "#9ecbb9", "#0f6e56", "#0b5c48", ""
+    if node.status == "error":
+        return "#fdecec", "#e3a6a6", "#a32d2d", "#a32d2d", ""
+    if node.repeated:
+        return "#fdf1ec", "#e4b3a2", "#d85a30", "#993c1d", ' stroke-dasharray="4 3"'
+    return "#ffffff", "#d8d5cc", "#185fa5", "#242424", ""
+
+
 def render_expanded_tree(report, limit: int = 120) -> str:
     """Render every selected invocation as a compact, fully visible SVG tree."""
 
@@ -126,8 +144,17 @@ def render_expanded_tree(report, limit: int = 120) -> str:
     for root in report.roots:
         collect(root)
 
+    labels = {id(node): compact_call(node.signature) for node in selected}
+    widths = {
+        id(node): max(62.0, min(210.0, _mono_width(labels[id(node)]) + 30))
+        for node in selected
+    }
+
+    node_height = 38.0
+    level_gap = 92.0
+    sibling_gap = 26.0
     positions: Dict[int, Tuple[float, float]] = {}
-    leaf_cursor = [0]
+    cursor = [0.0]
     maximum_depth = 0
 
     def place(node, depth: int) -> None:
@@ -135,32 +162,31 @@ def render_expanded_tree(report, limit: int = 120) -> str:
         maximum_depth = max(maximum_depth, depth)
         children = child_lists[id(node)]
         if not children:
-            x = 80 + leaf_cursor[0] * 135
-            leaf_cursor[0] += 1
+            x = cursor[0] + widths[id(node)] / 2
+            cursor[0] = x + widths[id(node)] / 2 + sibling_gap
         else:
             for child in children:
                 place(child, depth + 1)
             first_x = positions[id(children[0])][0]
             last_x = positions[id(children[-1])][0]
             x = (first_x + last_x) / 2
-        positions[id(node)] = (x, 24 + depth * 72)
+        positions[id(node)] = (x, 30 + depth * level_gap)
 
     for root in report.roots:
         if id(root) in child_lists:
             place(root, 0)
 
-    tree_width = 160 + max(0, leaf_cursor[0] - 1) * 135
-    width = max(600, tree_width)
-    horizontal_shift = (width - tree_width) / 2
-    if horizontal_shift:
+    content_width = max(0.0, cursor[0] - sibling_gap)
+    width = max(640.0, content_width + 64)
+    shift = (width - content_width) / 2
+    if shift:
         positions = {
-            node_id: (x + horizontal_shift, y)
-            for node_id, (x, y) in positions.items()
+            node_id: (x + shift, y) for node_id, (x, y) in positions.items()
         }
-    height = max(110, 24 + maximum_depth * 72 + 56)
+    height = max(140.0, 30 + maximum_depth * level_gap + node_height / 2 + 28)
     parts = [
         f'<svg role="img" aria-label="Fully expanded recursion tree for {esc(report.function_name)}" '
-        f'viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width:.0f} {height:.0f}" width="{width:.0f}" height="{height:.0f}" '
         'xmlns="http://www.w3.org/2000/svg">',
         f"<title>{esc(report.function_name)} expanded call tree</title>",
     ]
@@ -169,39 +195,65 @@ def render_expanded_tree(report, limit: int = 120) -> str:
         parent_x, parent_y = positions[id(parent)]
         for child in child_lists[id(parent)]:
             child_x, child_y = positions[id(child)]
+            start_y = parent_y + node_height / 2
+            end_y = child_y - node_height / 2
+            middle = (start_y + end_y) / 2
             parts.append(
-                f'<path class="rl-expanded-edge" d="M{parent_x},{parent_y + 28} '
-                f'L{child_x},{child_y + 6}" fill="none" stroke="#a9a7a0" stroke-width="1"/>'
+                f'<path class="rl-expanded-edge" d="M{parent_x:.1f},{start_y:.1f} '
+                f'C{parent_x:.1f},{middle:.1f} {child_x:.1f},{middle:.1f} '
+                f'{child_x:.1f},{end_y:.1f}" fill="none" stroke="#c6c3ba" '
+                'stroke-width="1.2"/>'
             )
 
     for node in selected:
         x, y = positions[id(node)]
+        fill, stroke, dot, ink, dash = _node_style(node)
         note = [node.signature]
         if node.cached:
             note.append("cache hit")
-            color = "#0f6e56"
-            decoration = ""
         elif node.status == "error":
             note.append(node.error or "error")
-            color = "#a32d2d"
-            decoration = ""
         elif node.repeated:
             note.append("repeated")
-            color = "#993c1d"
-            decoration = ' text-decoration="underline"'
-        else:
-            color = "#242424"
-            decoration = ""
         if node.result is not None:
             note.append(f"returned {node.result}")
-        parts.extend(
-            [
-                f'<g class="rl-expanded-node"><title>{esc(" · ".join(note))}</title>',
-                f'<text x="{x}" y="{y + 17}" text-anchor="middle" '
-                f'font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" '
-                f'fill="{color}"{decoration}>{esc(compact_call(node.signature))}</text></g>',
-            ]
+
+        if node.status == "error":
+            value = "error"
+        elif node.result is not None:
+            value = f"→ {node.result}"
+        else:
+            value = ""
+
+        left = x - widths[id(node)] / 2
+        if value:
+            label_y = y - 2
+            value_y = y + 12
+        else:
+            label_y = y + 4.3
+            value_y = None
+
+        parts.append(f'<g class="rl-expanded-node"><title>{esc(" · ".join(note))}</title>')
+        parts.append(
+            f'<rect x="{left:.1f}" y="{y - node_height / 2:.1f}" '
+            f'width="{widths[id(node)]:.1f}" height="{node_height:.1f}" rx="9" '
+            f'fill="{fill}" stroke="{stroke}" stroke-width="1"{dash}/>'
         )
+        parts.append(
+            f'<circle cx="{left + 11:.1f}" cy="{y:.1f}" r="3" fill="{dot}"/>'
+        )
+        parts.append(
+            f'<text x="{left + 20:.1f}" y="{label_y:.1f}" '
+            f'font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" '
+            f'fill="{ink}">{esc(labels[id(node)])}</text>'
+        )
+        if value_y is not None:
+            parts.append(
+                f'<text x="{left + 20:.1f}" y="{value_y:.1f}" '
+                'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" '
+                f'font-size="10" fill="#7a776e">{esc(short(value, 22))}</text>'
+            )
+        parts.append("</g>")
     parts.append("</svg>")
 
     omitted = report.recorded_calls - len(selected)
@@ -213,7 +265,7 @@ def render_expanded_tree(report, limit: int = 120) -> str:
     return (
         '<h3 class="rl-section">Expanded call tree</h3>'
         f'<div class="rl-legend">All {len(selected)} calls are visible. '
-        "Underlined coral = repeated; green = cache hit; red = error.</div>"
+        "White = executed · dashed coral = repeated · green = cache hit · red = error.</div>"
         f'<div class="rl-expanded">{"".join(parts)}</div>{notice}'
     )
 

@@ -51,7 +51,7 @@ def test_expanded_tree_shows_every_call_as_svg():
     assert output.count('<g class="rl-expanded-node">') == 9
     assert output.count('class="rl-expanded-edge"') == 8
     assert "<details" not in output
-    assert "Underlined coral = repeated" in output
+    assert "dashed coral = repeated" in output
     assert ">fib(4)</text>" in output
     assert "fib(n=4) · returned 3" in output
     assert "https://" not in output
