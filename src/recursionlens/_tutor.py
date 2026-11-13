@@ -276,7 +276,7 @@ class TutorPlayer:
         self.code_area = widgets.Textarea(
             value=code,
             description="",
-            layout=widgets.Layout(width="100%", height="190px"),
+            layout=widgets.Layout(width="100%", height="150px"),
             continuous_update=False,
         )
         self.call_input = widgets.Text(
@@ -311,11 +311,8 @@ class TutorPlayer:
 
         body = widgets.HBox(
             [
-                widgets.VBox([self.code_area], layout=widgets.Layout(width="50%")),
-                widgets.VBox(
-                    [widgets.HTML('<div class="rl-tutor-empty">Step through a run to see the call stack</div>'), self.stack_html],
-                    layout=widgets.Layout(width="50%"),
-                ),
+                widgets.VBox([self.code_html], layout=widgets.Layout(width="52%")),
+                widgets.VBox([self.stack_html], layout=widgets.Layout(width="48%")),
             ],
             layout=widgets.Layout(width="100%"),
         )
@@ -337,6 +334,7 @@ class TutorPlayer:
         )
         self._render_code()
         self._render_stack(None)
+        self.run()
 
     # -- state ---------------------------------------------------------
     @property

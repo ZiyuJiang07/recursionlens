@@ -122,6 +122,7 @@ def test_widget_builds_and_steps_through_the_trace():
     pytest.importorskip("ipywidgets")
     player = tutor()
 
+    assert player.trace is not None and player.trace.step_count == 60
     trace = player.run()
 
     assert trace.step_count == 60
