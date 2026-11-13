@@ -6,7 +6,7 @@
 
 RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab 中观察递归执行过程。它把一次追踪转换成可展开的调用树、压缩后的子问题 DAG，以及 naive 与 memoized 的定量对比。
 
-> **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.zh-CN.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)（[English version](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)）。15 个代码单元都已保存输出。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html)或[英文版](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
+> **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.zh-CN.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)（[English version](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)）。16 个代码单元都已保存输出。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html)或[英文版](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
 
 ## 项目团队
 
@@ -59,7 +59,7 @@ cd recursionlens
 python -m pip install -e ".[dev]"
 ```
 
-包没有运行时依赖。
+包没有运行时依赖。唯一可选的部分是交互式播放器，它需要 `ipywidgets`。
 
 ## JupyterLab 快速开始
 
@@ -103,6 +103,36 @@ comparison
 ```python
 assert fib(5) == 5
 assert fib.last_report.total_calls == 15
+```
+
+## 逐行单步执行
+
+0.2 版本新增了一个 Python Tutor 风格的播放器，直接在 notebook 里运行。粘贴一个函数、写好要执行的调用，就可以一步一步走：
+
+```python
+from recursionlens import tutor
+
+tutor()   # 可编辑的代码面板、调用输入框、步进控件
+```
+
+播放器会高亮当前执行的行，把每个栈帧连同局部变量一起显示出来；改动调用（例如 `fib(5)` → `fib(3)`）会重新记录一次运行并重画。每一步都会标明这是调用、普通行、返回还是异常，递归的进出顺序因此很容易看清。
+
+播放器会以正常 Python 语义执行你粘贴的代码，它不是沙箱。
+
+`tutor()` 需要 `ipywidgets`：
+
+```bash
+python -m pip install "recursionlens[tutor]"
+```
+
+记录过程本身是纯 Python，不用控件也能用：
+
+```python
+from recursionlens import record_tutor
+
+trace = record_tutor("def fib(n): ...", "fib(5)")
+print(trace.describe())
+trace.steps[0].frames        # 某一步的栈帧快照
 ```
 
 ## 导出报告

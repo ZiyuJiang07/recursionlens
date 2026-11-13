@@ -6,7 +6,7 @@
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 
-> **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) ([简体中文版](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)). All fifteen code cells have saved output. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) or its [Chinese version](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html).
+> **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) ([简体中文版](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)). All sixteen code cells have saved output. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) or its [Chinese version](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html).
 
 ## Project team
 
@@ -59,7 +59,7 @@ cd recursionlens
 python -m pip install -e ".[dev]"
 ```
 
-The package has no runtime dependencies.
+The package has no runtime dependencies. The interactive tutor is the only optional extra, and it needs `ipywidgets`.
 
 ## Quickstart in JupyterLab
 
@@ -103,6 +103,36 @@ Normal function behavior is preserved:
 ```python
 assert fib(5) == 5
 assert fib.last_report.total_calls == 15
+```
+
+## Step through a function line by line
+
+Version 0.2 adds a Python Tutor-style player that runs inside the notebook. Paste a function, choose the call, and step through it:
+
+```python
+from recursionlens import tutor
+
+tutor()   # editable code panel, an input box for the call, and step controls
+```
+
+The player highlights the current line, shows every stack frame with its local variables, and lets you change the call (for example `fib(5)` → `fib(3)`) to record a fresh run and redraw. It reports each call, line, return, and exception, which makes the order of a recursion easy to follow.
+
+The tutor runs the code you paste with normal Python semantics; it is not a sandbox.
+
+`tutor()` needs `ipywidgets`:
+
+```bash
+python -m pip install "recursionlens[tutor]"
+```
+
+The recording is plain Python, so it also works without the widget:
+
+```python
+from recursionlens import record_tutor
+
+trace = record_tutor("def fib(n): ...", "fib(5)")
+print(trace.describe())
+trace.steps[0].frames        # stack snapshot for one step
 ```
 
 ## Export a report

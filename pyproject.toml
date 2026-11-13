@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursionlens"
-version = "0.1.2"
-description = "Interactive recursion tracing, subproblem DAGs, and memoization comparisons for JupyterLab."
+version = "0.2.0"
+description = "Interactive recursion tracing, subproblem DAGs, memoization comparisons, and a Python Tutor-style step-through tutor for JupyterLab."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
@@ -17,7 +17,7 @@ authors = [
   { name = "Ruoxi LYU" },
   { name = "Haobo MA" },
 ]
-keywords = ["recursion", "jupyterlab", "visualization", "memoization", "education"]
+keywords = ["recursion", "jupyterlab", "visualization", "memoization", "education", "debugging", "python-tutor"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Education",
@@ -34,7 +34,8 @@ Tutorial = "https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/Recursio
 Issues = "https://github.com/ZiyuJiang07/recursionlens/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "coverage>=7"]
+dev = ["pytest>=8", "coverage>=7", "ipywidgets>=7.6"]
+tutor = ["ipywidgets>=7.6"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

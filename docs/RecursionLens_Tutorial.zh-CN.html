@@ -7836,7 +7836,7 @@ a.anchor-link {
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>'0.1.2'</pre>
+<pre>'0.2.0'</pre>
 </div>
 </div>
 </div>
@@ -8400,6 +8400,72 @@ DAG:     6 个节点，8 条边
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-tutor">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="9.-tutor()-%E4%B8%8E-record_tutor()-%E2%80%94-%E9%80%90%E8%A1%8C%E5%8D%95%E6%AD%A5%E6%89%A7%E8%A1%8C">9. <code>tutor()</code> 与 <code>record_tutor()</code> — 逐行单步执行<a class="anchor-link" href="#9.-tutor()-%E4%B8%8E-record_tutor()-%E2%80%94-%E9%80%90%E8%A1%8C%E5%8D%95%E6%AD%A5%E6%89%A7%E8%A1%8C">¶</a></h2><p><code>tutor()</code> 打开一个交互式播放器：可编辑代码、调用输入框、步进控件。它需要 <code>ipywidgets</code>（<code>pip install "recursionlens[tutor]"</code>）。</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">recursionlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">tutor</span>
+<span class="n">tutor</span><span class="p">()</span>
+</pre></div>
+<p>记录过程本身是纯 Python，不用控件也能拿到同样的步骤：</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-tutor">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">recursionlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">record_tutor</span>
+
+<span class="n">trace</span> <span class="o">=</span> <span class="n">record_tutor</span><span class="p">(</span>
+    <span class="s2">"def fib(n):</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    if n &lt; 2:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"        return n</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"    return fib(n - 1) + fib(n - 2)</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+    <span class="s2">"fib(4)"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
+<span class="p">[(</span><span class="n">step</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">event</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">line</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">trace</span><span class="o">.</span><span class="n">steps</span><span class="p">[:</span><span class="mi">6</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>call: fib(4)
+steps: 36
+max depth: 4
+result: 3
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[(0, 'call', 1, 1),
+ (1, 'line', 2, 1),
+ (2, 'line', 4, 1),
+ (3, 'call', 1, 2),
+ (4, 'line', 2, 2),
+ (5, 'line', 4, 2)]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ma-25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8494,6 +8560,16 @@ DAG:     6 个节点，8 条边
 <td><code>report.warnings</code>、<code>.truncated</code>、<code>.succeeded</code>、<code>.memoize</code></td>
 <td><code>list</code> / <code>bool</code></td>
 <td>运行标志</td>
+</tr>
+<tr>
+<td><code>tutor(code=, call=)</code></td>
+<td><code>TutorPlayer</code> 控件</td>
+<td>需要 <code>ipywidgets</code>；步进控件与实时栈</td>
+</tr>
+<tr>
+<td><code>record_tutor(code, call)</code></td>
+<td><code>TutorTrace</code></td>
+<td><code>.steps</code>、<code>.describe()</code>、<code>.error</code>；不需要控件</td>
 </tr>
 </tbody>
 </table>
