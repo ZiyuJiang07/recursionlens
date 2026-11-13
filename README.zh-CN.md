@@ -6,7 +6,7 @@
 
 RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab 中观察递归执行过程。它把一次追踪转换成可展开的调用树、压缩后的子问题 DAG，以及 naive 与 memoized 的定量对比。
 
-> **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)。15 个代码单元都已保存输出。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
+> **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.zh-CN.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)（[English version](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)）。15 个代码单元都已保存输出。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html)或[英文版](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
 
 ## 项目团队
 
@@ -126,8 +126,10 @@ HTML 报告是独立文件，不需要 notebook 服务器就能打开。JSON 包
 
 ## 文档与示例
 
-- [已执行的 JupyterLab 教程](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) — 每个公开命令一个示例：装饰器、报告对象、三种视图、指标、memoization、对比、导出与错误处理
-- [静态 HTML 教程预览](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) — 同一份教程，所有可视化报告已渲染，不需要 Jupyter
+- [命令手册（简体中文）](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb) — 每个公开命令一个示例：装饰器、报告对象、三种视图、指标、memoization、对比、导出与错误处理
+- [Command guide (English)](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) — the same guide in English
+- [静态 HTML 预览](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html) — 中文，不需要 Jupyter
+- [Static HTML preview](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) — English, no Jupyter required
 - [可直接运行的示例 notebook](https://github.com/ZiyuJiang07/recursionlens/blob/main/examples/demo.ipynb)
 
 ## 开发与测试
@@ -139,6 +141,8 @@ python -m twine check dist/*
 ```
 
 测试覆盖 trace 不变量、缓存行为、签名、异常、截断、JSON、HTML 转义、DAG 渲染与对比报告。贡献时应保持公共 API、测试与 README 同步。
+
+文档保持双语：`README.md` / `README.zh-CN.md` 与 `docs/RecursionLens_Tutorial.ipynb` / `docs/RecursionLens_Tutorial.zh-CN.ipynb` 必须同时更新，包括各自生成的 HTML。
 
 ## 许可证
 
