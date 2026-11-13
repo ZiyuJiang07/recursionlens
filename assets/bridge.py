@@ -1,6 +1,8 @@
 """Browser bridge: runs inside Pyodide and returns everything the page renders."""
 
 import ast
+import contextlib
+import io
 import json
 
 import recursionlens
@@ -35,9 +37,7 @@ def _run(code: str, call: str) -> dict:
     originals = {
         key: value
         for key, value in list(namespace.items())
-        if callable(value)
-        and not key.startswith("_")
-        and getattr(value, "__module__", None) == "__main__"
+        if callable(value) and getattr(value, "__module__", None) == "__main__"
     }
     for key, function in originals.items():
         namespace[key] = trace(function)
@@ -52,8 +52,9 @@ def _run(code: str, call: str) -> dict:
     if target is None or not hasattr(target, "run"):
         raise ValueError(f"{name} is not a function defined in the code.")
 
-    report = target.run(*args, **kwargs)
-    memoized = target.with_options(memoize=True).run(*args, **kwargs)
+    with contextlib.redirect_stdout(io.StringIO()):
+        report = target.run(*args, **kwargs)
+        memoized = target.with_options(memoize=True).run(*args, **kwargs)
     comparison = report.compare(memoized)
 
     tutor = record_tutor(code, call)
