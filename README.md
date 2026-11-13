@@ -20,7 +20,9 @@ CS1302A Group 50:
 
 ## Why RecursionLens?
 
-A recursive function normally exposes only its final return value or traceback. Students still have to reconstruct the execution in their heads. RecursionLens answers three different questions:
+RecursionLens grew out of a beginner's own difficulty with recursion. Loops can be read line by line, but a non-tail-recursive call such as `fib` or a tree traversal expands into many interleaved calls: the same subproblem is entered again and again, and a value only comes back after its whole subtree has finished. The step-by-step mentor provided by our course (OPT) is excellent for ordinary programs, since it shows one execution step at a time, yet a recursive run becomes a long stream of push and pop steps with no view of the overall shape of the computation, and no indication of which subproblems repeat. The usual fallback is to draw the call tree by hand on paper. RecursionLens automates that drawing and adds the numbers a hand-drawn tree cannot show.
+
+It answers three different questions:
 
 1. **Call tree:** what actually happened, invocation by invocation?
 2. **Subproblem DAG:** how many distinct problems and dependencies exist after identical arguments are merged?
