@@ -30,6 +30,8 @@ jobs:
           mkdir -p _site
           cp -r index.html assets src _site/
           printf '{"commit":"%s","built":"%s"}' "$GITHUB_SHA" "$(date -u +%FT%TZ)" > _site/version.json
+          sed -i "s|assets/app.css|assets/app.css?v=${GITHUB_SHA}|; s|assets/app.js|assets/app.js?v=${GITHUB_SHA}|" _site/index.html
+          grep -o 'assets/app.js?v=[a-f0-9]\{7\}' _site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
