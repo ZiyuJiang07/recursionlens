@@ -4,7 +4,7 @@
 
 **不只看递归返回了什么，还要看到重复计算发生在哪里。**
 
-**在线试用：** https://ziyujiang07.github.io/recursionlens/ —— 所有视图和逐行播放器都在浏览器里用 Pyodide 运行，无需安装。
+**在线试用：** https://ziyujiang07.github.io/recursionlens/ —— 所有视图和逐行播放器都在浏览器里用 Pyodide 运行，无需安装。示例菜单收录了 CS1302A 课件里出现的全部递归函数。
 
 RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab 中观察递归执行过程。它把一次追踪转换成可展开的调用树、压缩后的子问题 DAG，以及 naive 与 memoized 的定量对比。
 

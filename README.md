@@ -4,7 +4,7 @@
 
 **See not just what recursion returns, but where the repeated work happens.**
 
-**Try it in the browser:** https://ziyujiang07.github.io/recursionlens/ — every view and the line-by-line player run client-side with Pyodide, no installation.
+**Try it in the browser:** https://ziyujiang07.github.io/recursionlens/ — every view and the line-by-line player run client-side with Pyodide, no installation. The examples menu collects every recursive function found in the CS1302A lectures.
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 

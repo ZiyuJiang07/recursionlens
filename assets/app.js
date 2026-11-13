@@ -9,24 +9,6 @@ const PACKAGE_FILES = [
 
 const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
 
-const EXAMPLES = {
-  fib: `def fib(n):
-    if n < 2:
-        return n
-    return fib(n - 1) + fib(n - 2)
-`,
-  fact: `def fact(n):
-    if n <= 1:
-        return 1
-    return n * fact(n - 1)
-`,
-  sum: `def total(values):
-    if not values:
-        return 0
-    return values[0] + total(values[1:])
-`,
-};
-
 const state = {
   pyodide: null,
   runPayload: null,
@@ -382,6 +364,57 @@ function switchTab(name) {
   });
 }
 
+function populateExamples() {
+  const select = el("example");
+  const examples = window.RL_EXAMPLES || [];
+  if (!select || !examples.length) return;
+
+  const groups = new Map();
+  examples.forEach((item, index) => {
+    if (!groups.has(item.lecture)) groups.set(item.lecture, []);
+    groups.get(item.lecture).push({ ...item, index });
+  });
+
+  select.innerHTML =
+    '<option value="">Custom code…</option>' +
+    [...groups]
+      .map(
+        ([lecture, items]) =>
+          `<optgroup label="${escapeHtml(lecture)}">` +
+          items
+            .map(
+              (item) =>
+                `<option value="${item.index}">${escapeHtml(item.name)} · ${escapeHtml(item.call)}</option>`,
+            )
+            .join("") +
+          "</optgroup>",
+      )
+      .join("");
+
+  const load = (index) => {
+    const item = examples[index];
+    if (!item) return;
+    select.value = String(index);
+    el("code").value = item.code;
+    el("call").value = item.call;
+    el("example-note").textContent = item.note || "";
+    run();
+  };
+
+  select.addEventListener("change", () => {
+    if (select.value !== "") load(Number(select.value));
+  });
+
+  const requested = new URLSearchParams(window.location.search).get("example");
+  if (requested !== null) {
+    const index = Number(requested);
+    if (Number.isInteger(index) && examples[index]) {
+      load(index);
+      return;
+    }
+  }
+}
+
 function wire() {
   el("run").addEventListener("click", run);
   el("call").addEventListener("keydown", (event) => {
@@ -397,13 +430,7 @@ function wire() {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
 
-  document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      el("code").value = EXAMPLES[chip.dataset.code] || el("code").value;
-      el("call").value = chip.dataset.call;
-      run();
-    });
-  });
+  populateExamples();
 
   document.addEventListener("keydown", (event) => {
     if (event.target.tagName === "TEXTAREA" || event.target.tagName === "INPUT") return;

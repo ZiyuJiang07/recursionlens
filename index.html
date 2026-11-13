@@ -40,12 +40,11 @@
         </label>
         <button id="run" class="primary">Run</button>
         <div id="status" class="status">loading Python…</div>
-        <div class="examples">
-          <span>Try</span>
-          <button class="chip" data-code="fib" data-call="fib(6)">fib(6)</button>
-          <button class="chip" data-code="fact" data-call="fact(5)">fact(5)</button>
-          <button class="chip" data-code="sum" data-call="total([1, 2, 3, 4])">total(list)</button>
-        </div>
+        <label class="field">
+          <span>Examples from the CS1302A lectures</span>
+          <select id="example"></select>
+        </label>
+        <div id="example-note" class="hint"></div>
       </div>
     </div>
   </section>
@@ -104,6 +103,7 @@
   The package executes the code you paste; it is not a sandbox.
 </footer>
 
+<script src="assets/examples.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>
