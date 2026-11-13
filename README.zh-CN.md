@@ -6,7 +6,7 @@
 
 RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab 中观察递归执行过程。它把一次追踪转换成可展开的调用树、压缩后的子问题 DAG，以及 naive 与 memoized 的定量对比。
 
-> **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)。8 个代码单元都已保存输出。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
+> **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)。15 个代码单元都已保存输出。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
 
 ## 项目团队
 
@@ -126,7 +126,7 @@ HTML 报告是独立文件，不需要 notebook 服务器就能打开。JSON 包
 
 ## 文档与示例
 
-- [已执行的 JupyterLab 教程](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) — 安装、三种视图、对比、导出、排错，以及一分钟演示脚本
+- [已执行的 JupyterLab 教程](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) — 每个公开命令一个示例：装饰器、报告对象、三种视图、指标、memoization、对比、导出与错误处理
 - [静态 HTML 教程预览](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) — 同一份教程，所有可视化报告已渲染，不需要 Jupyter
 - [可直接运行的示例 notebook](https://github.com/ZiyuJiang07/recursionlens/blob/main/examples/demo.ipynb)
 

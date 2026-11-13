@@ -6,7 +6,7 @@
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 
-> **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb). All eight code cells have saved output. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html).
+> **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb). All fifteen code cells have saved output. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html).
 
 ## Project team
 
@@ -126,7 +126,7 @@ Version 0.1 targets synchronous, deterministic teaching examples such as factori
 
 ## Documentation and demo
 
-- [Executed JupyterLab tutorial](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) - setup, three views, comparison, export, troubleshooting, and a one-minute demo recipe
+- [Executed JupyterLab tutorial](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) - one example per public command: decorator, report object, three views, metrics, memoization, comparison, export, and error handling
 - [Static HTML tutorial preview](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) - the same tutorial with all visual reports rendered, no Jupyter required
 - [Runnable example notebook](https://github.com/ZiyuJiang07/recursionlens/blob/main/examples/demo.ipynb)
 

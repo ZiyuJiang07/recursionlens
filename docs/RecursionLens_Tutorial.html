@@ -7796,47 +7796,22 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cover">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-00">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="RecursionLens---JupyterLab-tutorial">RecursionLens - JupyterLab tutorial<a class="anchor-link" href="#RecursionLens---JupyterLab-tutorial">¶</a></h1><p><strong>This notebook is pre-executed.</strong> Every code cell already contains saved output. If Jupyter hides the HTML/SVG because the downloaded notebook is untrusted, use the notebook's <strong>Trust</strong> action (shield icon), or select <strong>Run All Cells</strong> once. The static HTML companion always shows every report without trusting or running anything.</p>
-<p>In this tutorial you will:</p>
-<ol>
-<li>trace a normal recursive function without changing its return value;</li>
-<li>compare a collapsible call tree with a fully expanded SVG tree;</li>
-<li>merge repeated subproblems into a DAG;</li>
-<li>measure what memoization changes;</li>
-<li>export standalone evidence.</li>
-</ol>
+<h1 id="RecursionLens-%E2%80%94-command-guide">RecursionLens — command guide<a class="anchor-link" href="#RecursionLens-%E2%80%94-command-guide">¶</a></h1><p>Every public command on one page: the decorator, the report object, its three views, its metrics, memoization, comparison, export, and error handling.</p>
+<div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>recursionlens
+</pre></div>
 <blockquote>
-<p><strong>To rerun it yourself:</strong> select <strong>Kernel -&gt; Restart Kernel and Run All Cells</strong>. No Graphviz, native library, external JavaScript, or CDN is required.</p>
+<p>Outputs below are already saved. If Jupyter hides SVG in a downloaded notebook, click <strong>Trust</strong> or run all cells once.</p>
 </blockquote>
-<p>This file targets <strong>RecursionLens 0.1.2</strong>.</p>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=setup-guide">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>Install in the same kernel that runs this notebook.</p>
-<p>After the PyPI release:</p>
-<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">recursionlens</span>
-</pre></div>
-<p>Before the PyPI release, install the tagged GitHub version:</p>
-<div class="highlight"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s2">"git+https://github.com/ZiyuJiang07/recursionlens.git@v0.1.2"</span>
-</pre></div>
-<p>If Jupyter reports that the package is missing immediately after installation, restart the kernel once. The next cell is already executed and shows what a successful import looks like.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=imports">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-01">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7847,7 +7822,7 @@ a.anchor-link {
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">recursionlens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">recursionlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">trace</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"RecursionLens version:"</span><span class="p">,</span> <span class="n">recursionlens</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="n">recursionlens</span><span class="o">.</span><span class="n">__version__</span>
 </pre></div>
 </div>
 </div>
@@ -7857,28 +7832,26 @@ a.anchor-link {
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>RecursionLens version: 0.1.2
-</pre>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>'0.1.2'</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=instrument">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-02">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1.-Trace-a-function-without-changing-it">1. Trace a function without changing it<a class="anchor-link" href="#1.-Trace-a-function-without-changing-it">¶</a></h2><p><code>@trace</code> records calls while leaving the function's normal behaviour intact. A normal call still returns the original value and raises the original exception.</p>
-<p>The function below is the naive Fibonacci implementation. It deliberately recomputes the same subproblems many times.</p>
+<h2 id="1.-@trace-%E2%80%94-instrument-a-function-without-changing-it">1. <code>@trace</code> — instrument a function without changing it<a class="anchor-link" href="#1.-@trace-%E2%80%94-instrument-a-function-without-changing-it">¶</a></h2><p>The decorated function is still callable, still returns the same value, and still raises the same exceptions.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=define-fib">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-03">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7892,10 +7865,7 @@ a.anchor-link {
         <span class="k">return</span> <span class="n">n</span>
     <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="n">value</span> <span class="o">=</span> <span class="n">fib</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">5</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Return value:"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Calls recorded by the normal call:"</span><span class="p">,</span> <span class="n">fib</span><span class="o">.</span><span class="n">last_report</span><span class="o">.</span><span class="n">total_calls</span><span class="p">)</span>
+<span class="n">fib</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>          <span class="c1"># ordinary call, ordinary return value</span>
 </pre></div>
 </div>
 </div>
@@ -7905,34 +7875,26 @@ a.anchor-link {
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Return value: 5
-Calls recorded by the normal call: 15
-</pre>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[2]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>5</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=tree-explanation">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-04">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2.-Collapsible-call-tree">2. Collapsible call tree<a class="anchor-link" href="#2.-Collapsible-call-tree">¶</a></h2><p>A report object renders automatically at the end of a JupyterLab cell. This view is useful for large runs: no node is open by default beyond the first levels, and each triangle expands its children.</p>
-<p>Watch for:</p>
-<ul>
-<li><strong>repeated</strong>: the same argument signature has already appeared;</li>
-<li><strong>cache hit</strong>: a memoized call reused a result;</li>
-<li><strong>error</strong>: the invocation raised an exception.</li>
-</ul>
+<p>The last call is also kept on the function as <code>last_report</code>.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=tree-view">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-05">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7940,8 +7902,7 @@ Calls recorded by the normal call: 15
 <div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">naive</span> <span class="o">=</span> <span class="n">fib</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">naive</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fib</span><span class="o">.</span><span class="n">last_report</span><span class="o">.</span><span class="n">total_calls</span><span class="p">,</span> <span class="n">fib</span><span class="o">.</span><span class="n">last_report</span><span class="o">.</span><span class="n">value</span>
 </pre></div>
 </div>
 </div>
@@ -7953,6 +7914,45 @@ Calls recorded by the normal call: 15
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>(15, 5)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-06">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-fn.run(*args)-%E2%80%94-get-a-TraceReport">2. <code>fn.run(*args)</code> — get a <code>TraceReport</code><a class="anchor-link" href="#2.-fn.run(*args)-%E2%80%94-get-a-TraceReport">¶</a></h2><p><code>run</code> returns a report instead of the value: default <code>memoize=False</code>, <code>max_calls=1000</code>.
+Displaying the report renders the collapsible call tree.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-07">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">report</span> <span class="o">=</span> <span class="n">fib</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">report</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <style>
 .rl-wrap{--rl-blue:#185fa5;--rl-blue-bg:#e6f1fb;--rl-coral:#d85a30;--rl-coral-bg:#faece7;--rl-green:#0f6e56;--rl-green-bg:#e1f5ee;--rl-text:#242424;--rl-muted:#66645f;--rl-border:#dedcd5;color:var(--rl-text);background:#fff;border:1px solid var(--rl-border);border-radius:12px;padding:18px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;box-sizing:border-box;margin:8px 0;max-width:100%;overflow:auto}
@@ -7963,32 +7963,25 @@ Calls recorded by the normal call: 15
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=expanded-explanation">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-08">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3.-Fully-expanded-SVG-tree">3. Fully expanded SVG tree<a class="anchor-link" href="#3.-Fully-expanded-SVG-tree">¶</a></h2><p><code>mode="expanded"</code> shows every recorded invocation at once. This is the view to use when explaining the complete recursion shape.</p>
-<ul>
-<li>black labels: first occurrence of a subproblem;</li>
-<li>underlined coral labels: repeated calls;</li>
-<li>green labels: cache hits;</li>
-<li>red labels: errors.</li>
-</ul>
-<p>For <code>fib(5)</code>, all <strong>15</strong> calls are visible without clicking.</p>
+<h2 id="3.-report.show(mode=...)-%E2%80%94-three-views">3. <code>report.show(mode=...)</code> — three views<a class="anchor-link" href="#3.-report.show(mode=...)-%E2%80%94-three-views">¶</a></h2><p><code>"tree"</code> is the default collapsible tree above, <code>"expanded"</code> draws every call as one SVG tree, <code>"dag"</code> merges equal arguments into subproblems.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=expanded-view">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-09">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">naive</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"expanded"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">report</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"expanded"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8009,35 +8002,15 @@ Calls recorded by the normal call: 15
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dag-explanation">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="4.-The-same-run-as-a-subproblem-DAG">4. The same run as a subproblem DAG<a class="anchor-link" href="#4.-The-same-run-as-a-subproblem-DAG">¶</a></h2><p>The tree contains every invocation. The DAG merges invocations with identical arguments into one node, so <strong>15 calls collapse into 6 unique subproblems</strong>.</p>
-<p>The DAG keeps dependency edges and stores three counts per node:</p>
-<ul>
-<li><code>calls</code>: how many times the subproblem was observed;</li>
-<li><code>executed</code>: how many times its body actually ran;</li>
-<li><code>cached</code>: how many times its result came from the cache.</li>
-</ul>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=dag-view">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">naive</span><span class="o">.</span><span class="n">dag_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
-<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">naive</span><span class="o">.</span><span class="n">dag_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"DAG: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">naive</span><span class="o">.</span><span class="n">dag_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> nodes, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">naive</span><span class="o">.</span><span class="n">dag_edges</span><span class="p">)</span><span class="si">}</span><span class="s2"> edges"</span><span class="p">)</span>
-<span class="n">naive</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"dag"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">report</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"dag"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -8047,13 +8020,6 @@ Calls recorded by the normal call: 15
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>DAG: 6 nodes, 8 edges
-</pre>
-</div>
-</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
@@ -8066,31 +8032,180 @@ Calls recorded by the normal call: 15
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=memoization-explanation">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-Compare-naive-and-memoized-execution">5. Compare naive and memoized execution<a class="anchor-link" href="#5.-Compare-naive-and-memoized-execution">¶</a></h2><p>The memoized run calls the same function with the same input, but caches results by argument identity.</p>
-<p>A cache probe still counts as an <strong>observed call</strong>, but it does not execute the function body. That is why the memoized run observes 9 calls while executing only 6 bodies.</p>
+<h2 id="4.-Fields,-properties,-and-metrics()">4. Fields, properties, and <code>metrics()</code><a class="anchor-link" href="#4.-Fields,-properties,-and-metrics()">¶</a></h2><p>Counters live on the report as attributes and properties. <code>metrics()</code> returns them as one dictionary.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=comparison-view">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">report</span><span class="o">.</span><span class="n">metrics</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>{'total_calls': 15,
+ 'recorded_calls': 15,
+ 'executed_calls': 15,
+ 'cached_calls': 0,
+ 'unique_subproblems': 6,
+ 'repeated_calls': 9,
+ 'max_depth': 5,
+ 'memoize': False,
+ 'truncated': False,
+ 'succeeded': True}</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-13">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"value:    </span><span class="si">{</span><span class="n">report</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"result:   </span><span class="si">{</span><span class="n">report</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"dag:      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">dag_nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> nodes, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">dag_edges</span><span class="p">)</span><span class="si">}</span><span class="s2"> edges"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"warnings: </span><span class="si">{</span><span class="n">report</span><span class="o">.</span><span class="n">warnings</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"node 0:   </span><span class="si">{</span><span class="n">report</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">signature</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">report</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>value:    5
+result:   5
+dag:      6 nodes, 8 edges
+warnings: []
+node 0:   fib(n=5) -&gt; returned
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-14">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5.-fn.with_options(...)-%E2%80%94-memoization-and-recording-limits">5. <code>fn.with_options(...)</code> — memoization and recording limits<a class="anchor-link" href="#5.-fn.with_options(...)-%E2%80%94-memoization-and-recording-limits">¶</a></h2><p><code>memoize=True</code> caches by argument value and type; <code>max_calls</code> caps how many calls are recorded, not executed.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-15">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">memoized</span> <span class="o">=</span> <span class="n">fib</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span><span class="n">memoize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">memoized</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">naive</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">5</span>
-<span class="k">assert</span> <span class="n">memoized</span><span class="o">.</span><span class="n">executed_calls</span> <span class="o">==</span> <span class="mi">6</span>
-<span class="k">assert</span> <span class="n">memoized</span><span class="o">.</span><span class="n">cached_calls</span> <span class="o">==</span> <span class="mi">3</span>
-
-<span class="n">comparison</span> <span class="o">=</span> <span class="n">naive</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">memoized</span><span class="p">)</span>
+<span class="n">memoized</span><span class="o">.</span><span class="n">metrics</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>{'total_calls': 9,
+ 'recorded_calls': 9,
+ 'executed_calls': 6,
+ 'cached_calls': 3,
+ 'unique_subproblems': 6,
+ 'repeated_calls': 3,
+ 'max_depth': 5,
+ 'memoize': True,
+ 'truncated': False,
+ 'succeeded': True}</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-16">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">capped</span> <span class="o">=</span> <span class="n">fib</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">capped</span><span class="o">.</span><span class="n">total_calls</span><span class="p">,</span> <span class="n">capped</span><span class="o">.</span><span class="n">recorded_calls</span><span class="p">,</span> <span class="n">capped</span><span class="o">.</span><span class="n">truncated</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>(15, 6, True)</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-17">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="6.-report.compare(other,-labels=...)-%E2%80%94-ComparisonReport">6. <code>report.compare(other, labels=...)</code> — <code>ComparisonReport</code><a class="anchor-link" href="#6.-report.compare(other,-labels=...)-%E2%80%94-ComparisonReport">¶</a></h2><p>Compare two runs of the same function. The comparison also renders as HTML, with two DAGs side by side.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-18">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">comparison</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">memoized</span><span class="p">)</span>
 <span class="n">comparison</span>
 </pre></div>
 </div>
@@ -8102,7 +8217,7 @@ Calls recorded by the normal call: 15
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <style>
 .rl-wrap{--rl-blue:#185fa5;--rl-blue-bg:#e6f1fb;--rl-coral:#d85a30;--rl-coral-bg:#faece7;--rl-green:#0f6e56;--rl-green-bg:#e1f5ee;--rl-text:#242424;--rl-muted:#66645f;--rl-border:#dedcd5;color:var(--rl-text);background:#fff;border:1px solid var(--rl-border);border-radius:12px;padding:18px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;box-sizing:border-box;margin:8px 0;max-width:100%;overflow:auto}
@@ -8112,205 +8227,276 @@ Calls recorded by the normal call: 15
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-19">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=numbers">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">comparison</span><span class="o">.</span><span class="n">same_result</span><span class="p">,</span> <span class="n">comparison</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s2">"delta"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>(True,
+ {'total_calls': -6,
+  'executed_calls': -9,
+  'cached_calls': 3,
+  'unique_subproblems': 0,
+  'repeated_calls': -6,
+  'max_depth': 0})</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="6.-The-numbers-to-remember">6. The numbers to remember<a class="anchor-link" href="#6.-The-numbers-to-remember">¶</a></h2><table>
+<h2 id="7.-Export-%E2%80%94-to_html,-export_html,-to_dict,-export_json">7. Export — <code>to_html</code>, <code>export_html</code>, <code>to_dict</code>, <code>export_json</code><a class="anchor-link" href="#7.-Export-%E2%80%94-to_html,-export_html,-to_dict,-export_json">¶</a></h2><p><code>to_html(mode=...)</code> returns a string; <code>export_html</code> writes a standalone file; <code>to_dict()</code> and <code>export_json()</code> carry the same data as JSON.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-21">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"recursionlens-"</span><span class="p">))</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">report</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"tree.html"</span><span class="p">),</span>
+    <span class="n">report</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"dag.html"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"dag"</span><span class="p">),</span>
+    <span class="n">comparison</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"comparison.html"</span><span class="p">),</span>
+    <span class="n">report</span><span class="o">.</span><span class="n">export_json</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"trace.json"</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"expanded"</span><span class="p">)),</span> <span class="p">[(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[13]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>(8788,
+ [('tree.html', 5657),
+  ('dag.html', 6841),
+  ('comparison.html', 11776),
+  ('trace.json', 8571)])</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-22">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">sorted</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[14]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>['dag',
+ 'error',
+ 'function_name',
+ 'metrics',
+ 'result',
+ 'roots',
+ 'schema_version',
+ 'warnings']</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-23">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="8.-Errors-%E2%80%94-succeeded,-error,-and-re-raise">8. Errors — <code>succeeded</code>, <code>error</code>, and re-raise<a class="anchor-link" href="#8.-Errors-%E2%80%94-succeeded,-error,-and-re-raise">¶</a></h2><p>A failing run still produces a report; the original exception is re-raised so program behavior does not change.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=code-24">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nd">@trace</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fail</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"boom"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fail</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">fail</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"re-raised:"</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+
+<span class="n">fail</span><span class="o">.</span><span class="n">last_report</span><span class="o">.</span><span class="n">succeeded</span><span class="p">,</span> <span class="n">fail</span><span class="o">.</span><span class="n">last_report</span><span class="o">.</span><span class="n">error</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>re-raised: boom
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>(False, 'ValueError: boom')</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=md-25">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="API-at-a-glance">API at a glance<a class="anchor-link" href="#API-at-a-glance">¶</a></h2><table>
 <thead>
 <tr>
-<th>Metric</th>
-<th style="text-align:right">Naive</th>
-<th style="text-align:right">Memoized</th>
-<th>Why</th>
+<th>Command</th>
+<th>Returns</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Observed calls</td>
-<td style="text-align:right">15</td>
-<td style="text-align:right">9</td>
-<td>Cache probes are still calls</td>
+<td><code>@trace</code></td>
+<td>wrapped function</td>
+<td>keeps return value and exceptions</td>
 </tr>
 <tr>
-<td>Executed bodies</td>
-<td style="text-align:right">15</td>
-<td style="text-align:right">6</td>
-<td>Only one body per unique subproblem</td>
+<td><code>fn(*args)</code></td>
+<td>original value</td>
+<td>no report from a plain call</td>
 </tr>
 <tr>
-<td>Cache hits</td>
-<td style="text-align:right">0</td>
-<td style="text-align:right">3</td>
-<td><code>fib(1)</code>, <code>fib(2)</code>, <code>fib(3)</code> reused</td>
+<td><code>fn.run(*args)</code></td>
+<td><code>TraceReport</code></td>
+<td><code>memoize=False</code>, <code>max_calls=1000</code></td>
 </tr>
 <tr>
-<td>Unique subproblems</td>
-<td style="text-align:right">6</td>
-<td style="text-align:right">6</td>
-<td>Same problem space</td>
+<td><code>fn.with_options(memoize=, max_calls=)</code></td>
+<td><code>RunConfiguration</code></td>
+<td>chain <code>.run(*args)</code></td>
 </tr>
 <tr>
-<td>DAG edges</td>
-<td style="text-align:right">8</td>
-<td style="text-align:right">8</td>
-<td>Same dependency structure</td>
+<td><code>fn.last_report</code></td>
+<td><code>TraceReport</code> or <code>None</code></td>
+<td>updated by every call</td>
 </tr>
 <tr>
-<td>Maximum depth</td>
-<td style="text-align:right">5</td>
-<td style="text-align:right">5</td>
-<td>Recursion chain is unchanged</td>
+<td><code>report.show(mode=)</code></td>
+<td><code>None</code></td>
+<td>displays <code>"tree"</code>, <code>"expanded"</code>, <code>"dag"</code></td>
+</tr>
+<tr>
+<td><code>report.to_html(mode=)</code></td>
+<td><code>str</code></td>
+<td>inline HTML/SVG</td>
+</tr>
+<tr>
+<td><code>report.export_html(path, mode=)</code></td>
+<td><code>Path</code></td>
+<td>standalone document</td>
+</tr>
+<tr>
+<td><code>report.metrics()</code></td>
+<td><code>dict</code></td>
+<td>counters and flags</td>
+</tr>
+<tr>
+<td><code>report.to_dict()</code> / <code>export_json(path)</code></td>
+<td><code>dict</code> / <code>Path</code></td>
+<td>schema version 1</td>
+</tr>
+<tr>
+<td><code>report.compare(other, labels=)</code></td>
+<td><code>ComparisonReport</code></td>
+<td><code>.same_result</code>, <code>.show()</code>, <code>.to_dict()</code>, <code>.export_html()</code></td>
+</tr>
+<tr>
+<td><code>report.value</code> / <code>.result</code> / <code>.error</code></td>
+<td>Python value / <code>str</code> / <code>str</code></td>
+<td>top-level outcome</td>
+</tr>
+<tr>
+<td><code>report.total_calls</code>, <code>.recorded_calls</code>, <code>.executed_calls</code>, <code>.cached_calls</code></td>
+<td><code>int</code></td>
+<td>call counters</td>
+</tr>
+<tr>
+<td><code>report.unique_subproblems</code>, <code>.repeated_calls</code>, <code>.max_depth</code></td>
+<td><code>int</code></td>
+<td>DAG and depth metrics</td>
+</tr>
+<tr>
+<td><code>report.dag_nodes</code> / <code>.dag_edges</code></td>
+<td><code>list</code></td>
+<td>merged subproblems</td>
+</tr>
+<tr>
+<td><code>report.warnings</code>, <code>.truncated</code>, <code>.succeeded</code>, <code>.memoize</code></td>
+<td><code>list</code> / <code>bool</code></td>
+<td>run flags</td>
 </tr>
 </tbody>
 </table>
-<p>The headline result is <strong>15 executed bodies -&gt; 6 executed bodies</strong>, not 15 -&gt; 9. The 9 includes cache probes.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=linear-explanation">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="7.-Contrast-with-linear-recursion">7. Contrast with linear recursion<a class="anchor-link" href="#7.-Contrast-with-linear-recursion">¶</a></h2><p>Repeated subproblems are not inevitable. Factorial has deep recursion but no repeated arguments, so its DAG has one node per call and <strong>zero repeated calls</strong>.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=linear-view">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="nd">@trace</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="n">linear</span> <span class="o">=</span> <span class="n">factorial</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">linear</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">120</span>
-<span class="k">assert</span> <span class="n">linear</span><span class="o">.</span><span class="n">repeated_calls</span> <span class="o">==</span> <span class="mi">0</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"factorial(5):"</span><span class="p">,</span> <span class="n">linear</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"calls:"</span><span class="p">,</span> <span class="n">linear</span><span class="o">.</span><span class="n">total_calls</span><span class="p">,</span> <span class="s2">"unique:"</span><span class="p">,</span> <span class="n">linear</span><span class="o">.</span><span class="n">unique_subproblems</span><span class="p">,</span> <span class="s2">"repeated:"</span><span class="p">,</span> <span class="n">linear</span><span class="o">.</span><span class="n">repeated_calls</span><span class="p">)</span>
-<span class="n">linear</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"expanded"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>factorial(5): 120
-calls: 5 unique: 5 repeated: 0
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<style>
-.rl-wrap{--rl-blue:#185fa5;--rl-blue-bg:#e6f1fb;--rl-coral:#d85a30;--rl-coral-bg:#faece7;--rl-green:#0f6e56;--rl-green-bg:#e1f5ee;--rl-text:#242424;--rl-muted:#66645f;--rl-border:#dedcd5;color:var(--rl-text);background:#fff;border:1px solid var(--rl-border);border-radius:12px;padding:18px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;box-sizing:border-box;margin:8px 0;max-width:100%;overflow:auto}
-.rl-wrap *{box-sizing:border-box}.rl-title{font-size:18px;font-weight:600;margin:0 0 4px}.rl-subtitle{color:var(--rl-muted);font-size:13px;margin:0 0 16px}.rl-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:12px 0 18px}.rl-metric{background:#f6f5f1;border-radius:8px;padding:10px}.rl-metric-label{font-size:11px;color:var(--rl-muted)}.rl-metric-value{font-size:21px;font-weight:600;margin-top:2px}.rl-section{font-size:14px;font-weight:600;margin:18px 0 8px}.rl-tree,.rl-tree ul{list-style:none;padding-left:20px}.rl-tree{padding-left:0}.rl-tree details{margin:4px 0}.rl-tree summary{cursor:pointer;padding:5px 8px;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.rl-tree summary:hover{background:var(--rl-blue-bg)}.rl-result{color:var(--rl-muted);font-size:11px;margin-left:6px}.rl-badge{display:inline-block;border-radius:4px;padding:1px 5px;margin-left:5px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:10px;font-weight:500}.rl-repeat{color:#993c1d;background:var(--rl-coral-bg)}.rl-cached{color:var(--rl-green);background:var(--rl-green-bg)}.rl-error{color:#a32d2d;background:#fcebeb}.rl-warning{color:#854f0b;background:#faeeda;border-radius:6px;padding:8px;margin:8px 0;font-size:12px}.rl-dag{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-legend{font-size:11px;color:var(--rl-muted);margin:6px 0}.rl-table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0 16px}.rl-table th,.rl-table td{text-align:right;border-bottom:1px solid var(--rl-border);padding:8px}.rl-table th:first-child,.rl-table td:first-child{text-align:left}.rl-table th{color:var(--rl-muted);font-weight:500}.rl-delta-up{color:#a32d2d}.rl-delta-down{color:var(--rl-green)}.rl-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.rl-note{font-size:12px;color:var(--rl-muted)}.rl-expanded{max-width:100%;overflow:auto;background:#fafaf8;border-radius:8px;padding:8px}.rl-expanded svg{display:block;margin:auto}
-</style><section class="rl-wrap"><h2 class="rl-title">RecursionLens · factorial</h2><p class="rl-subtitle">naive run · returned <code>120</code></p><div class="rl-metrics"><div class="rl-metric"><div class="rl-metric-label">Observed calls</div><div class="rl-metric-value">5</div></div><div class="rl-metric"><div class="rl-metric-label">Executed bodies</div><div class="rl-metric-value">5</div></div><div class="rl-metric"><div class="rl-metric-label">Cache hits</div><div class="rl-metric-value">0</div></div><div class="rl-metric"><div class="rl-metric-label">Unique subproblems</div><div class="rl-metric-value">5</div></div><div class="rl-metric"><div class="rl-metric-label">Repeated calls</div><div class="rl-metric-value">0</div></div><div class="rl-metric"><div class="rl-metric-label">Maximum depth</div><div class="rl-metric-value">5</div></div></div><h3 class="rl-section">Expanded call tree</h3><div class="rl-legend">All 5 calls are visible. Underlined coral = repeated; green = cache hit; red = error.</div><div class="rl-expanded"><svg aria-label="Fully expanded recursion tree for factorial" height="368" role="img" viewbox="0 0 600 368" width="600" xmlns="http://www.w3.org/2000/svg"><title>factorial expanded call tree</title><path class="rl-expanded-edge" d="M300.0,52 L300.0,102" fill="none" stroke="#a9a7a0" stroke-width="1"></path><path class="rl-expanded-edge" d="M300.0,124 L300.0,174" fill="none" stroke="#a9a7a0" stroke-width="1"></path><path class="rl-expanded-edge" d="M300.0,196 L300.0,246" fill="none" stroke="#a9a7a0" stroke-width="1"></path><path class="rl-expanded-edge" d="M300.0,268 L300.0,318" fill="none" stroke="#a9a7a0" stroke-width="1"></path><g class="rl-expanded-node"><title>factorial(n=5) · returned 120</title><text fill="#242424" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" text-anchor="middle" x="300.0" y="41">factorial(5)</text></g><g class="rl-expanded-node"><title>factorial(n=4) · returned 24</title><text fill="#242424" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" text-anchor="middle" x="300.0" y="113">factorial(4)</text></g><g class="rl-expanded-node"><title>factorial(n=3) · returned 6</title><text fill="#242424" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" text-anchor="middle" x="300.0" y="185">factorial(3)</text></g><g class="rl-expanded-node"><title>factorial(n=2) · returned 2</title><text fill="#242424" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" text-anchor="middle" x="300.0" y="257">factorial(2)</text></g><g class="rl-expanded-node"><title>factorial(n=1) · returned 1</title><text fill="#242424" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" text-anchor="middle" x="300.0" y="329">factorial(1)</text></g></svg></div></section>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=export-explanation">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="8.-Export-evidence">8. Export evidence<a class="anchor-link" href="#8.-Export-evidence">¶</a></h2><p>Reports can leave the notebook as standalone HTML or versioned JSON. The following cell writes all three views plus one JSON trace to a temporary directory and prints their sizes.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=export">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-
-<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">folder</span><span class="p">:</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
-    <span class="n">naive</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">output</span> <span class="o">/</span> <span class="s2">"fib-tree.html"</span><span class="p">)</span>
-    <span class="n">naive</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">output</span> <span class="o">/</span> <span class="s2">"fib-expanded.html"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"expanded"</span><span class="p">)</span>
-    <span class="n">naive</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">output</span> <span class="o">/</span> <span class="s2">"fib-dag.html"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"dag"</span><span class="p">)</span>
-    <span class="n">naive</span><span class="o">.</span><span class="n">export_json</span><span class="p">(</span><span class="n">output</span> <span class="o">/</span> <span class="s2">"fib-trace.json"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> bytes"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>fib-dag.html           6,841 bytes
-fib-expanded.html      9,041 bytes
-fib-trace.json         8,571 bytes
-fib-tree.html          5,657 bytes
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=troubleshooting">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Troubleshooting">Troubleshooting<a class="anchor-link" href="#Troubleshooting">¶</a></h2><h3 id="The-cell-shows-text-instead-of-a-rendered-tree">The cell shows text instead of a rendered tree<a class="anchor-link" href="#The-cell-shows-text-instead-of-a-rendered-tree">¶</a></h3><p>Put the report on the last line of a code cell, call <code>report.show()</code>, or use <code>report.show(mode="expanded")</code>. Outside IPython, <code>show()</code> returns the HTML string instead of displaying it.</p>
-<h3 id="A-large-tree-is-truncated">A large tree is truncated<a class="anchor-link" href="#A-large-tree-is-truncated">¶</a></h3><p>The default limit is 1,000 recorded nodes. Raise it deliberately with <code>fib.with_options(max_calls=5000).run(...)</code>. The actual function result is never truncated.</p>
-<h3 id="Memoization-did-not-apply">Memoization did not apply<a class="anchor-link" href="#Memoization-did-not-apply">¶</a></h3><p>Memoization requires hashable bound arguments. Unhashable arguments produce a warning and those calls remain uncached.</p>
-<h3 id="The-report-says-an-exception-was-raised">The report says an exception was raised<a class="anchor-link" href="#The-report-says-an-exception-was-raised">¶</a></h3><p>RecursionLens records the error and re-raises the original exception. Inspect the last run with <code>function.last_report</code>.</p>
-<h3 id="Scope">Scope<a class="anchor-link" href="#Scope">¶</a></h3><p>Version 0.1 targets synchronous, deterministic teaching functions. It is not a sandbox for untrusted code, and repeated arguments do not imply redundant work for side-effecting functions.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=demo-recipe">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="One-minute-demo-recipe">One-minute demo recipe<a class="anchor-link" href="#One-minute-demo-recipe">¶</a></h2><ol>
-<li>Run the naive Fibonacci cell and say: "15 calls, but only 6 unique subproblems."</li>
-<li>Show the expanded tree for five seconds.</li>
-<li>Show the DAG and say: "This is the recursion after merging identical work."</li>
-<li>Show the comparison and say: "Memoization executes 6 bodies instead of 15."</li>
-<li>Close with the innovation: "One trace becomes a call tree, a subproblem DAG, and a measured comparison without Graphviz."</li>
-</ol>
-<p>Next: <a href="https://github.com/ZiyuJiang07/recursionlens#readme">README</a>, <a href="https://github.com/ZiyuJiang07/recursionlens/tree/main/examples">Example gallery</a>.</p>
+<p>Two limits worth knowing: memoization needs hashable arguments (otherwise a warning is recorded and those calls are not cached), and RecursionLens executes your function — it is not a sandbox.</p>
 </div>
 </div>
 </div>
