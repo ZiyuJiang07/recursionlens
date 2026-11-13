@@ -253,8 +253,8 @@ _CSS = """
 .rl-tutor-code .t{white-space:pre}
 .rl-tutor-stack{display:flex;flex-direction:column;max-height:340px;overflow:auto;padding:2px}
 .rl-stack-node{position:relative;display:flex;flex-direction:column}
-.rl-stack-children{margin-left:10px;padding-left:16px;border-left:1px solid #ddd9cd;margin-top:8px;display:flex;flex-direction:column}
-.rl-stack-children > .rl-stack-node::before{content:"";position:absolute;left:-17px;top:23px;width:15px;border-top:1px solid #ddd9cd}
+.rl-stack-children{margin-left:10px;padding-left:16px;margin-top:8px;display:flex;flex-direction:column}
+.rl-stack-children > .rl-stack-node::before{content:"";position:absolute;left:-16px;top:-8px;width:16px;height:31px;border-left:1px solid #ddd9cd;border-bottom:1px solid #ddd9cd;border-bottom-left-radius:9px}
 .rl-tutor-frame{border:1px solid #e2dfd6;border-radius:10px;padding:8px 11px;background:#fff}
 .rl-tutor-frame.cur{border-color:#d85a30;background:#fffaf7}
 .rl-tutor-head{font-size:12px;font-weight:600;display:flex;justify-content:space-between;gap:8px}
