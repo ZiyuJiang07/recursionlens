@@ -28,6 +28,13 @@ window.RL_EXAMPLES = [
     "code": "count, depth = 0, -1\n\ndef fibonacci(n):\n    \"\"\"Returns the Fibonacci number of order n.\"\"\"\n    global count, depth\n    count += 1\n    depth += 1\n    print(\"{:>3}: {}fibonacci({!r})\".format(count, \"|\" * depth, n))\n\n    value = fibonacci(n - 1) + fibonacci(n - 2) if n > 1 else 1 if n == 1 else 0\n\n    depth -= 1\n    if depth == -1:  # recursion done\n        print(\"Done\")\n        count = 0  # reset count for subsequent recursions\n    return value\n"
   },
   {
+    "lecture": "Lecture 6 · Generator and Decorator",
+    "name": "fibonacci (lru_cache)",
+    "call": "fibonacci(10)",
+    "note": "lru_cache computes each n once: 19 calls instead of 177 for n = 10",
+    "code": "import functools\n\n@functools.lru_cache(maxsize=None)\ndef fibonacci(n):\n    \"\"\"Returns the Fibonacci number of order n.\"\"\"\n    return fibonacci(n - 1) + fibonacci(n - 2) if n > 1 else 1 if n == 1 else 0\n"
+  },
+  {
     "lecture": "Lecture 8 · Sequence Types",
     "name": "quicksort",
     "call": "quicksort([3, 1, 2, 5, 4])",
