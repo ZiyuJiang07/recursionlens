@@ -60,20 +60,36 @@ async function boot() {
     const fs = state.pyodide.FS;
     fs.mkdirTree("/rl/recursionlens");
     for (const name of PACKAGE_FILES) {
-      const response = await fetch(`src/recursionlens/${name}`);
+      const response = await fetch(`src/recursionlens/${name}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`cannot load ${name}`);
       fs.writeFile(`/rl/recursionlens/${name}`, await response.text());
     }
 
     state.pyodide.runPython('import sys; sys.path.insert(0, "/rl")');
-    const bridge = await (await fetch("assets/bridge.py")).text();
+    const bridge = await (await fetch("assets/bridge.py", { cache: "no-store" })).text();
     state.pyodide.runPython(bridge);
     state.runPayload = state.pyodide.globals.get("run_payload");
 
     setStatus("ready");
+    showBuild();
     await run();
   } catch (error) {
     setStatus(`failed to start: ${error}`, true);
+  }
+}
+
+async function showBuild() {
+  try {
+    const response = await fetch("version.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const info = await response.json();
+    const tag = document.querySelector(".brand .tag");
+    if (tag && info.commit) {
+      tag.textContent = `web playground · ${String(info.commit).slice(0, 7)}`;
+      tag.title = `deployed ${info.built || ""}`;
+    }
+  } catch (error) {
+    /* the badge is optional */
   }
 }
 
@@ -115,7 +131,7 @@ async function run() {
 
     const suffix = data.tutor.error ? ` · ${data.tutor.error}` : "";
     const truncated = data.tutor.truncated ? " · recording truncated" : "";
-    setStatus(`done · ${state.steps.length} steps${suffix}${truncated}`);
+    setStatus(`done · ${state.steps.length} steps · v${data.version}${suffix}${truncated}`);
   } catch (error) {
     setStatus(String(error), true);
   } finally {

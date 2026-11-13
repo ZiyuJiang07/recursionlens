@@ -29,8 +29,14 @@ jobs:
         run: |
           mkdir -p _site
           cp -r index.html assets src _site/
+          printf '{"commit":"%s","built":"%s"}' "$GITHUB_SHA" "$(date -u +%FT%TZ)" > _site/version.json
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Smoke test
+        run: |
+          sleep 5
+          curl -fsS "${{ steps.deployment.outputs.page_url }}" | grep -q "RecursionLens"
+          curl -fsS "${{ steps.deployment.outputs.page_url }}src/recursionlens/_tutor.py" | grep -q "record_tutor"

@@ -3,6 +3,7 @@
 import ast
 import json
 
+import recursionlens
 from recursionlens import record_tutor, trace
 
 MAX_TUTOR_STEPS = 1500
@@ -93,6 +94,7 @@ def _run(code: str, call: str) -> dict:
             "result": tutor.result,
             "stdout": tutor.stdout[-4000:],
         },
+        "version": recursionlens.__version__,
         "json": None,
     }
 
