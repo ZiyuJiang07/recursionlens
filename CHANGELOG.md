@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Simplified Chinese README (`README.zh-CN.md`) with a language switcher in both READMEs.
+
+### Fixed
+
+- Author name casing in the README team list and copyright line now matches the other Group 50 members (`Ziyu JIANG`).
+
 ## 0.1.2 — 2026-11-12
 
 ### Changed

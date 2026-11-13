@@ -1,5 +1,7 @@
 # RecursionLens
 
+**English** | [简体中文](https://github.com/ZiyuJiang07/recursionlens/blob/main/README.zh-CN.md)
+
 **See not just what recursion returns, but where the repeated work happens.**
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
@@ -10,7 +12,7 @@ RecursionLens is a zero-runtime-dependency Python package for exploring recursiv
 
 CS1302A Group 50:
 
-- Ziyu Jiang
+- Ziyu JIANG
 - Xinyue CAI
 - Kehan CAO
 - Ruoxi LYU
@@ -143,4 +145,4 @@ The test suite covers trace invariants, cache behavior, signatures, exceptions, 
 
 ## License
 
-MIT © 2026 Ziyu Jiang, Xinyue Cai, Kehan Cao, Ruoxi Lyu, Haobo Ma.
+MIT © 2026 Ziyu JIANG, Xinyue CAI, Kehan CAO, Ruoxi LYU, Haobo MA.
