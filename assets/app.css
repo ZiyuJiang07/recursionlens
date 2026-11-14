@@ -73,6 +73,7 @@ main { max-width: 1180px; margin: 18px auto 40px; padding: 0 18px; }
 }
 
 .label {
+  display: block;
   font-size: 11px;
   letter-spacing: .02em;
   text-transform: uppercase;
@@ -251,6 +252,67 @@ input#slider { flex: 1 1 220px; accent-color: var(--coral); }
 }
 
 .panel .rl-wrap { margin: 0; }
+.view-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.view-panels { flex: 1; min-width: 0; }
+.trace-inspector {
+  flex: none;
+  width: 268px;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 14px;
+}
+.trace-inspector h2, .doctor h2 { font-size: 17px; margin: 0 0 8px; }
+.trace-inspector h3, .doctor h3 { font-size: 13px; margin: 12px 0 4px; }
+.trace-inspector code { overflow-wrap: anywhere; }
+.trace-note { color: var(--muted); font-size: 12px; margin: 5px 0 10px; }
+.trace-note.trace-error { color: var(--red); overflow-wrap: anywhere; }
+.trace-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.trace-action { color: var(--blue); font-size: 12px; line-height: 1.4; padding: 5px 8px; }
+.trace-action:hover { background: var(--blue-soft); border-color: var(--blue); }
+.trace-action:focus-visible, .tabs button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.inspect-call { margin-left: 8px; padding: 2px 5px; vertical-align: middle; }
+.call-path, .occurrence-list {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 10px;
+  padding: 3px 3px 3px 16px;
+  max-height: 250px;
+  overflow: auto;
+  list-style: none;
+}
+.call-path { border-left: 2px solid #a8c4dd; padding-left: 8px; }
+.call-path button { text-align: left; overflow-wrap: anywhere; }
+.occurrence-list { padding-left: 3px; }
+.call-path [aria-current] { color: var(--blue); font-size: 12px; font-weight: 700; }
+.doctor { padding: 18px; }
+.doctor-finding { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 2px; }
+.doctor-finding h3 { font-size: 14px; }
+.doctor-finding p { margin: 4px 0; font-size: 13px; overflow-wrap: anywhere; }
+.panel .rl-tree summary.subproblem-match { background: var(--coral-soft); }
+.panel .rl-tree summary.call-on-path { box-shadow: inset 3px 0 var(--blue); }
+.panel .rl-tree summary.call-selected { background: var(--blue-soft); }
+g[role="button"][data-subproblem-id] { cursor: pointer; }
+g[role="button"][data-subproblem-id]:focus-visible { outline: none; }
+g[role="button"][data-subproblem-id]:focus-visible > rect,
+g[role="button"][data-subproblem-id]:hover > rect {
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+g.subproblem-match > rect { stroke: var(--coral); stroke-width: 2; }
+g.call-on-path > rect, path.call-on-path { stroke: var(--blue); stroke-width: 2; }
+g.call-selected > rect { fill: var(--blue-soft); stroke-width: 3; }
+#panel-dag g.subproblem-match > rect { stroke: var(--blue); stroke-width: 3; }
+@media (max-width: 900px) {
+  .view-layout { flex-direction: column; align-items: stretch; }
+  .trace-inspector { width: 100%; order: -1; margin-top: 0; }
+}
 .jsonout {
   margin: 0;
   max-height: 560px;
