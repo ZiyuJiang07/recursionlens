@@ -1,6 +1,5 @@
 const PACKAGE_FILES = [
   "__init__.py",
-  "_doctor.py",
   "_model.py",
   "_render.py",
   "_report.py",
@@ -9,19 +8,13 @@ const PACKAGE_FILES = [
 ];
 
 const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
-const LINKED_VIEWS = ["tree", "expanded", "dag"];
-const STEP_CONTROLS = ["first", "prev", "next", "last", "slider"];
 
 const state = {
   pyodide: null,
   runPayload: null,
-  source: "",
   steps: [],
   index: 0,
-  trace: null,
-  view: "step",
-  callId: null,
-  subproblemId: null,
+  tutor: null,
 };
 
 const el = (id) => document.getElementById(id);
@@ -88,7 +81,6 @@ async function run() {
   if (!state.runPayload) return;
   const button = el("run");
   button.disabled = true;
-  clearResults();
   setStatus("running…");
 
   try {
@@ -102,7 +94,7 @@ async function run() {
       return;
     }
 
-    state.source = code;
+    state.tutor = data.tutor;
     state.steps = data.tutor.steps || [];
     state.index = 0;
 
@@ -113,45 +105,20 @@ async function run() {
     el("panel-compare").innerHTML = data.views.compare;
     el("jsonout").textContent =
       data.json || "// JSON omitted for this run because it is very large.";
-    loadTrace(data.trace);
-    renderDoctor(data.doctor || []);
-    el("results").hidden = false;
-    switchTab(state.view);
 
     const slider = el("slider");
     slider.max = Math.max(0, state.steps.length - 1);
     slider.value = 0;
-    STEP_CONTROLS.forEach((id) => { el(id).disabled = !state.steps.length; });
     renderStep(0);
 
+    const suffix = data.tutor.error ? ` · ${data.tutor.error}` : "";
     const truncated = data.tutor.truncated ? " · recording truncated" : "";
-    const error = data.run_error || data.tutor.error;
-    if (error) {
-      setStatus(`${error} Recorded trace available below.`, true);
-    } else {
-      setStatus(`Done · ${state.steps.length} steps · v${data.version}${truncated}`);
-    }
+    setStatus(`done · ${state.steps.length} steps · v${data.version}${suffix}${truncated}`);
   } catch (error) {
-    clearResults();
     setStatus(String(error), true);
   } finally {
     button.disabled = false;
   }
-}
-
-function clearResults() {
-  state.source = "";
-  state.steps = [];
-  state.trace = null;
-  state.callId = null;
-  state.subproblemId = null;
-  el("results").hidden = true;
-}
-
-function markResultsStale() {
-  if (el("results").hidden) return;
-  clearResults();
-  setStatus("Code or call changed. Run again to see the new trace.");
 }
 
 const METRIC_LABELS = [
@@ -321,7 +288,7 @@ function renderTree(nodes, running) {
 }
 
 function renderCode(step) {
-  const lines = state.source.split("\n");
+  const lines = el("code").value.split("\n");
   const currentLine = step ? step.line : -1;
   el("stepcode").innerHTML = lines
     .map((text, i) => {
@@ -386,257 +353,15 @@ function renderStep(index) {
   }
 }
 
-/* --------------------------------------------------------- linked trace */
-
-function element(tag, text, className) {
-  const node = document.createElement(tag);
-  if (text !== undefined) node.textContent = text;
-  if (className) node.className = className;
-  return node;
-}
-
-function actionButton(label, action, className = "trace-action") {
-  const button = element("button", label, className);
-  button.type = "button";
-  button.addEventListener("click", action);
-  return button;
-}
-
-function loadTrace(trace) {
-  if (!trace) return;
-  const calls = new Map();
-  const subproblems = new Map(
-    trace.dag.nodes.map((node) => [node.identity, { ...node, occurrences: [] }]),
-  );
-
-  function indexCalls(nodes, parentId) {
-    for (const node of nodes) {
-      calls.set(node.call_id, { ...node, parentId });
-      subproblems.get(node.identity)?.occurrences.push(node.call_id);
-      indexCalls(node.children, node.call_id);
-    }
-  }
-
-  indexCalls(trace.roots, null);
-  state.trace = { calls, subproblems };
-  wireTraceNodes();
-}
-
-function wireTraceNodes() {
-  const { calls, subproblems } = state.trace;
-  for (const summary of el("panel-tree").querySelectorAll("summary[data-call-id]")) {
-    const id = Number(summary.dataset.callId);
-    const call = calls.get(id);
-    if (!call) continue;
-    const inspect = actionButton("Inspect", (event) => {
-      event.preventDefault();
-      selectCall(id);
-    }, "trace-action inspect-call");
-    inspect.setAttribute("aria-label", `Inspect call #${id + 1}, ${call.signature}`);
-    summary.append(inspect);
-  }
-
-  for (const view of ["expanded", "dag"]) {
-    const panel = el(`panel-${view}`);
-    const svg = panel.querySelector("svg");
-    if (svg) svg.setAttribute("role", "group");
-    for (const group of panel.querySelectorAll("g[data-subproblem-id]")) {
-      const callId = Number(group.dataset.callId);
-      const identity = group.dataset.subproblemId;
-      const item = view === "expanded" ? calls.get(callId) : subproblems.get(identity);
-      if (!item) continue;
-      const select = view === "expanded" ? () => selectCall(callId) : () => selectSubproblem(identity);
-      group.setAttribute("role", "button");
-      group.setAttribute("tabindex", "0");
-      group.setAttribute("aria-label", item.signature);
-      group.addEventListener("click", select);
-      group.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        select();
-      });
-    }
-  }
-}
-
-function callPath(callId) {
-  const path = [];
-  let id = callId;
-  while (id !== null) {
-    const call = state.trace.calls.get(id);
-    path.push(call);
-    id = call.parentId;
-  }
-  return path.reverse();
-}
-
-function selectCall(id, openTree = false) {
-  const call = state.trace?.calls.get(id);
-  if (!call) return;
-  state.callId = id;
-  state.subproblemId = call.identity;
-  if (openTree) {
-    switchTab("tree");
-    focusTraceSelection();
-  } else {
-    renderSelection();
-  }
-}
-
-function selectSubproblem(identity, openDag = false) {
-  if (!state.trace?.subproblems.has(identity)) return;
-  if (state.trace.calls.get(state.callId)?.identity !== identity) state.callId = null;
-  state.subproblemId = identity;
-  if (openDag) {
-    switchTab("dag");
-    focusTraceSelection();
-  } else {
-    renderSelection();
-  }
-}
-
-function focusTraceSelection() {
-  const panel = el(`panel-${state.view}`);
-  const selected = panel.querySelector(
-    state.view === "dag" ? ".subproblem-match" : ".call-selected .inspect-call, g.call-selected",
-  );
-  const target = selected || el("inspector-heading");
-  target.focus({ preventScroll: true });
-  target.scrollIntoView({ block: "nearest", inline: "nearest" });
-}
-
-function renderSelection() {
-  const inspector = el("trace-inspector");
-  inspector.hidden = !state.trace || !LINKED_VIEWS.includes(state.view);
-  if (inspector.hidden) return;
-
-  const path = callPath(state.callId);
-  const pathIds = new Set(path.map((call) => call.call_id));
-  const body = el("inspector-body");
-  const panel = el(`panel-${state.view}`);
-  for (const node of panel.querySelectorAll("[data-subproblem-id]")) {
-    const id = Number(node.dataset.callId);
-    const match = node.dataset.subproblemId === state.subproblemId;
-    const selected = id === state.callId;
-    node.classList.toggle("subproblem-match", match);
-    node.classList.toggle("call-on-path", pathIds.has(id));
-    node.classList.toggle("call-selected", selected);
-
-    if (node.matches("summary")) {
-      node.querySelector(".inspect-call")?.setAttribute("aria-pressed", String(selected));
-      if (pathIds.has(id)) node.parentElement.open = true;
-    } else if (node.getAttribute("role") === "button") {
-      node.setAttribute("aria-pressed", String(state.view === "dag" ? match : selected));
-    }
-  }
-  for (const edge of panel.querySelectorAll("[data-parent-call-id][data-child-call-id]")) {
-    const onPath = pathIds.has(Number(edge.dataset.parentCallId))
-      && pathIds.has(Number(edge.dataset.childCallId));
-    edge.classList.toggle("call-on-path", onPath);
-  }
-
-  body.replaceChildren();
-  const subproblem = state.trace.subproblems.get(state.subproblemId);
-  if (!subproblem) {
-    body.append(element("p", state.view === "dag"
-      ? "Select a node to find every recorded call to that subproblem."
-      : state.view === "tree"
-        ? "Choose Inspect next to a call to see its path from the root and find its subproblem."
-        : "Select a call to highlight its path from the root and find its subproblem.", "trace-note"));
-    return;
-  }
-
-  body.append(element("h3", "Subproblem"));
-  body.append(element("code", subproblem.signature));
-  const recorded = subproblem.occurrences.length;
-  body.append(element("p", `${recorded} recorded ${recorded === 1 ? "call" : "calls"} · ${subproblem.executed} executed · ${subproblem.cached} cache hits`, "trace-note"));
-  if (path.length) {
-    const call = path.at(-1);
-    body.append(element("h3", "Call path"));
-    const chain = element("ol", undefined, "call-path");
-    for (const entry of path) {
-      const item = element("li");
-      const selected = entry.call_id === state.callId;
-      const label = `#${entry.call_id + 1} ${entry.signature}`;
-      if (selected) {
-        item.append(element("code", label));
-        item.setAttribute("aria-current", "true");
-      } else {
-        item.append(actionButton(label, () => selectCall(entry.call_id, true)));
-      }
-      chain.append(item);
-    }
-    body.append(chain);
-    if (call.error) body.append(element("p", call.error, "trace-note trace-error"));
-    else if (call.result !== null) body.append(element("p", `Returned ${call.result}`, "trace-note"));
-  }
-  if (state.view === "dag") {
-    const visible = panel.querySelector(".subproblem-match");
-    if (!visible) body.append(element("p", "This node is outside the rendered graph. Its recorded calls are listed below.", "trace-note"));
-    body.append(element("h3", "Recorded calls"));
-    const list = element("ul", undefined, "occurrence-list");
-    for (const id of subproblem.occurrences) {
-      const call = state.trace.calls.get(id);
-      const item = element("li");
-      const button = actionButton(`Call #${id + 1} · depth ${call.depth}`, () => selectCall(id, true));
-      button.setAttribute("aria-label", `Show call #${id + 1} in tree, ${call.signature}`);
-      item.append(button);
-      list.append(item);
-    }
-    body.append(list);
-  }
-  const actions = element("div", undefined, "trace-actions");
-  if (state.view !== "dag") {
-    actions.append(actionButton("Show in DAG", () => selectSubproblem(subproblem.identity, true)));
-  }
-  actions.append(actionButton("Clear selection", () => {
-    state.callId = null;
-    state.subproblemId = null;
-    renderSelection();
-    el("inspector-heading").focus();
-  }));
-  body.append(actions);
-}
-
-function renderDoctor(findings) {
-  const card = element("div", undefined, "card inner doctor");
-  card.append(element("h2", "Recursion Doctor"));
-  card.append(element("p", "Findings are based on calls recorded for this run.", "trace-note"));
-  if (!findings.length) {
-    card.append(element("p", "No repeated execution or recursive re-entry was found in the recorded calls."));
-  }
-  for (const finding of findings) {
-    const article = element("article", undefined, "doctor-finding");
-    article.append(element("h3", finding.title), element("p", finding.message));
-    const actions = element("div", undefined, "trace-actions");
-    for (const id of finding.call_ids) {
-      const call = state.trace?.calls.get(id);
-      if (!call) continue;
-      const button = actionButton(`Show call #${id + 1}`, () => selectCall(id, true));
-      button.setAttribute("aria-label", `Show call #${id + 1} in tree, ${call.signature}`);
-      actions.append(button);
-    }
-    if (state.trace?.subproblems.has(finding.subproblem_id)) {
-      actions.append(actionButton("Show in DAG", () => selectSubproblem(finding.subproblem_id, true)));
-    }
-    if (actions.childElementCount) article.append(actions);
-    card.append(article);
-  }
-  el("panel-doctor").replaceChildren(card);
-}
-
 /* ---------------------------------------------------------------- ui */
 
 function switchTab(name) {
-  state.view = name;
   document.querySelectorAll("#tabs button").forEach((button) => {
-    const active = button.dataset.tab === name;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-selected", String(active));
-    button.tabIndex = active ? 0 : -1;
-    el(button.getAttribute("aria-controls")).hidden = !active;
+    button.classList.toggle("active", button.dataset.tab === name);
   });
-  renderSelection();
+  ["step", "tree", "expanded", "dag", "compare", "json"].forEach((key) => {
+    el(`panel-${key}`).hidden = key !== name;
+  });
 }
 
 function populateExamples() {
@@ -691,8 +416,6 @@ function populateExamples() {
 }
 
 function wire() {
-  el("code").addEventListener("input", markResultsStale);
-  el("call").addEventListener("input", markResultsStale);
   el("run").addEventListener("click", run);
   el("call").addEventListener("keydown", (event) => {
     if (event.key === "Enter") run();
@@ -703,27 +426,14 @@ function wire() {
   el("last").addEventListener("click", () => renderStep(state.steps.length - 1));
   el("slider").addEventListener("input", (event) => renderStep(Number(event.target.value)));
 
-  const tabs = [...document.querySelectorAll("#tabs button")];
-  tabs.forEach((button, index) => {
+  document.querySelectorAll("#tabs button").forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
-    button.addEventListener("keydown", (event) => {
-      let next;
-      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-      else if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
-      else if (event.key === "Home") next = 0;
-      else if (event.key === "End") next = tabs.length - 1;
-      else return;
-      event.preventDefault();
-      switchTab(tabs[next].dataset.tab);
-      tabs[next].focus();
-    });
   });
 
   populateExamples();
 
   document.addEventListener("keydown", (event) => {
-    if (state.view !== "step" || !state.steps.length) return;
-    if (event.defaultPrevented || event.target.closest("textarea, input, select, #tabs")) return;
+    if (event.target.tagName === "TEXTAREA" || event.target.tagName === "INPUT") return;
     if (event.key === "ArrowRight") renderStep(state.index + 1);
     if (event.key === "ArrowLeft") renderStep(state.index - 1);
   });

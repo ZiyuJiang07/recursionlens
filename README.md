@@ -137,16 +137,6 @@ print(trace.describe())
 trace.steps[0].frames        # stack snapshot for one step
 ```
 
-## Inspect a call in the browser
-
-From the repository root, run `python -m http.server 8000`. Open [the local playground](http://localhost:8000) and run the default `fib(5)` example.
-
-1. In **Call tree** or **Expanded tree**, select a `fib(2)` call. **Call path** shows how that invocation was reached, for example `fib(5) → fib(4) → fib(3) → fib(2)`.
-2. Switch to **Subproblem DAG** to see the same subproblem as one node. The other occurrences let you trace the same computation back through different branches of the call tree.
-3. Open **Recursion Doctor** and follow a finding to the calls that support it. The Doctor looks for repeated subproblems on different branches and calls that re-enter an identical subproblem already on the active path. If the trace is partial, its findings cover only the recorded calls.
-
-Doctor findings describe what was observed for the selected input. Re-entering an active subproblem is a prompt to check the stopping condition or the arguments passed to the recursive call. Repetition across branches is a reason to investigate memoization when the function is deterministic and has no side effects.
-
 ## Export a report
 
 ```python

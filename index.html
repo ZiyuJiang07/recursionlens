@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RecursionLens · web playground</title>
-<meta name="description" content="Trace recursion, link call paths to subproblems, and inspect evidence for repeated work with Recursion Doctor.">
+<meta name="description" content="Trace recursion in the browser: collapsible call tree, expanded SVG tree, subproblem DAG, memoization comparison, and a line-by-line Python Tutor-style player.">
 <link rel="stylesheet" href="assets/app.css">
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 </head>
@@ -26,7 +26,7 @@
   <section class="card editor">
     <div class="editor-grid">
       <div class="code-col">
-        <label class="label" for="code">Python code</label>
+        <div class="label">Python code</div>
         <textarea id="code" spellcheck="false" autocomplete="off">def fib(n):
     if n < 2:
         return n
@@ -38,8 +38,8 @@
           <span>Input call</span>
           <input id="call" value="fib(5)" spellcheck="false" autocomplete="off">
         </label>
-        <button id="run" class="primary" disabled>Run</button>
-        <div id="status" class="status" role="status">Loading Python…</div>
+        <button id="run" class="primary">Run</button>
+        <div id="status" class="status">loading Python…</div>
         <label class="field">
           <span>Examples from the CS1302A lectures</span>
           <select id="example"></select>
@@ -49,29 +49,25 @@
     </div>
   </section>
 
-  <div id="results" hidden>
-  <section id="metrics" class="metrics" aria-label="Run metrics"></section>
+  <section id="metrics" class="metrics"></section>
 
-  <div id="tabs" class="tabs" role="tablist" aria-label="Trace views">
-    <button id="tab-step" data-tab="step" role="tab" aria-controls="panel-step" aria-selected="true" class="active">Step through</button>
-    <button id="tab-tree" data-tab="tree" role="tab" aria-controls="panel-tree" aria-selected="false" tabindex="-1">Call tree</button>
-    <button id="tab-expanded" data-tab="expanded" role="tab" aria-controls="panel-expanded" aria-selected="false" tabindex="-1">Expanded tree</button>
-    <button id="tab-dag" data-tab="dag" role="tab" aria-controls="panel-dag" aria-selected="false" tabindex="-1">Subproblem DAG</button>
-    <button id="tab-compare" data-tab="compare" role="tab" aria-controls="panel-compare" aria-selected="false" tabindex="-1">Compare</button>
-    <button id="tab-doctor" data-tab="doctor" role="tab" aria-controls="panel-doctor" aria-selected="false" tabindex="-1">Recursion Doctor</button>
-    <button id="tab-json" data-tab="json" role="tab" aria-controls="panel-json" aria-selected="false" tabindex="-1">JSON</button>
-  </div>
+  <nav id="tabs" class="tabs">
+    <button data-tab="step" class="active">Step through</button>
+    <button data-tab="tree">Call tree</button>
+    <button data-tab="expanded">Expanded tree</button>
+    <button data-tab="dag">Subproblem DAG</button>
+    <button data-tab="compare">Compare</button>
+    <button data-tab="json">JSON</button>
+  </nav>
 
-  <div class="view-layout">
-  <div class="view-panels">
-  <section id="panel-step" class="panel" role="tabpanel" aria-labelledby="tab-step">
+  <section id="panel-step" class="panel">
     <div class="player">
       <div class="player-bar">
         <button id="first" title="First step">⏮</button>
         <button id="prev" title="Previous step">◀</button>
         <button id="next" title="Next step">▶</button>
         <button id="last" title="Last step">⏭</button>
-        <input id="slider" type="range" min="0" max="0" value="0" aria-label="Execution step">
+        <input id="slider" type="range" min="0" max="0" value="0">
         <div id="stepinfo" class="stepinfo">run the code to start stepping</div>
       </div>
       <div class="player-grid">
@@ -93,21 +89,13 @@
     </div>
   </section>
 
-  <section id="panel-tree" class="panel" role="tabpanel" aria-labelledby="tab-tree" hidden></section>
-  <section id="panel-expanded" class="panel" role="tabpanel" aria-labelledby="tab-expanded" hidden></section>
-  <section id="panel-dag" class="panel" role="tabpanel" aria-labelledby="tab-dag" hidden></section>
-  <section id="panel-compare" class="panel" role="tabpanel" aria-labelledby="tab-compare" hidden></section>
-  <section id="panel-doctor" class="panel" role="tabpanel" aria-labelledby="tab-doctor" hidden></section>
-  <section id="panel-json" class="panel" role="tabpanel" aria-labelledby="tab-json" hidden>
+  <section id="panel-tree" class="panel" hidden></section>
+  <section id="panel-expanded" class="panel" hidden></section>
+  <section id="panel-dag" class="panel" hidden></section>
+  <section id="panel-compare" class="panel" hidden></section>
+  <section id="panel-json" class="panel" hidden>
     <div class="card inner"><pre id="jsonout" class="jsonout"></pre></div>
   </section>
-  </div>
-  <aside id="trace-inspector" class="card trace-inspector" aria-labelledby="inspector-heading" hidden>
-    <h2 id="inspector-heading" tabindex="-1">Trace inspector</h2>
-    <div id="inspector-body"></div>
-  </aside>
-  </div>
-  </div>
 </main>
 
 <footer>
