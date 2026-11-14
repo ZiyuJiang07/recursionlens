@@ -2,11 +2,14 @@
 
 import ast
 import contextlib
+import html
 import io
 import json
 
 import recursionlens
 from recursionlens import record_tutor, trace
+from recursionlens._doctor import diagnose
+from recursionlens._render import render_report
 
 MAX_TUTOR_STEPS = 1500
 MAX_JSON_CHARS = 400_000
@@ -19,19 +22,9 @@ def _message(exc: BaseException) -> str:
     return f"{type(exc).__name__}: {exc}"
 
 
-def _run(code: str, call: str) -> dict:
-    call = (call or "").strip()
-    if not call:
-        raise ValueError("Enter a call such as fib(5).")
-
+def _prepare_call(code, expression):
     namespace = {"__name__": "__main__"}
-    exec(compile(code, "<web>", "exec"), namespace)
-
-    expression = ast.parse(call, mode="eval").body
-    if not isinstance(expression, ast.Call):
-        raise ValueError("Enter a function call, for example fib(5).")
-    if not isinstance(expression.func, ast.Name):
-        raise ValueError("Call a function defined in the code, for example fib(5).")
+    exec(code, namespace)
     name = expression.func.id
 
     originals = {
@@ -51,11 +44,43 @@ def _run(code: str, call: str) -> dict:
     target = namespace.get(name)
     if target is None or not hasattr(target, "run"):
         raise ValueError(f"{name} is not a function defined in the code.")
+    return target, args, kwargs
 
+
+def _run(code: str, call: str) -> dict:
+    call = (call or "").strip()
+    if not call:
+        raise ValueError("Enter a call such as fib(5).")
+
+    expression = ast.parse(call, mode="eval").body
+    if not isinstance(expression, ast.Call):
+        raise ValueError("Enter a function call, for example fib(5).")
+    if not isinstance(expression.func, ast.Name):
+        raise ValueError("Call a function defined in the code, for example fib(5).")
+    compiled = compile(code, "<web>", "exec")
+
+    run_error = None
     with contextlib.redirect_stdout(io.StringIO()):
-        report = target.run(*args, **kwargs)
-        memoized = target.with_options(memoize=True).run(*args, **kwargs)
-    comparison = report.compare(memoized)
+        target, args, kwargs = _prepare_call(compiled, expression)
+        try:
+            report = target.run(*args, **kwargs)
+        except BaseException as exc:
+            report = target.last_report
+            if report is None or not report.roots:
+                raise
+            run_error = _message(exc)
+
+        if run_error:
+            comparison_html = '<p class="hint">Comparison unavailable because this run raised an error.</p>'
+        else:
+            try:
+                target, args, kwargs = _prepare_call(compiled, expression)
+                memoized = target.with_options(memoize=True).run(*args, **kwargs)
+            except BaseException as exc:
+                error = html.escape(_message(exc))
+                comparison_html = f'<p class="hint">Comparison unavailable: {error}</p>'
+            else:
+                comparison_html = report.compare(memoized).to_html()
 
     tutor = record_tutor(code, call)
     steps = []
@@ -78,16 +103,19 @@ def _run(code: str, call: str) -> dict:
             }
         )
 
+    serialized = report.to_dict()
     payload = {
         "views": {
-            "tree": report.to_html(),
-            "expanded": report.to_html(mode="expanded"),
-            "dag": report.to_html(mode="dag"),
-            "compare": comparison.to_html(),
+            "tree": render_report(report, interactive=True),
+            "expanded": render_report(report, mode="expanded", interactive=True),
+            "dag": render_report(report, mode="dag", interactive=True),
+            "compare": comparison_html,
         },
         "metrics": report.metrics(),
         "result": report.result,
-        "error": report.error,
+        "run_error": run_error,
+        "trace": {"roots": serialized["roots"], "dag": serialized["dag"]},
+        "doctor": diagnose(report),
         "tutor": {
             "steps": steps,
             "truncated": tutor.step_count > MAX_TUTOR_STEPS or tutor.truncated,
@@ -100,7 +128,7 @@ def _run(code: str, call: str) -> dict:
     }
 
     try:
-        dumped = json.dumps(report.to_dict(), indent=2, ensure_ascii=False)
+        dumped = json.dumps(serialized, indent=2, ensure_ascii=False)
         payload["json"] = dumped if len(dumped) <= MAX_JSON_CHARS else None
     except (TypeError, ValueError):
         payload["json"] = None
