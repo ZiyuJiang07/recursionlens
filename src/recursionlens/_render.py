@@ -71,7 +71,11 @@ def report_header(report) -> str:
     )
 
 
-def render_tree_node(node) -> str:
+def _call_attributes(node) -> str:
+    return f' data-call-id="{node.call_id}" data-subproblem-id="{esc(node.identity)}"'
+
+
+def render_tree_node(node, *, interactive: bool = False) -> str:
     badges = ""
     if node.repeated:
         badges += '<span class="rl-badge rl-repeat">repeated</span>'
@@ -89,15 +93,18 @@ def render_tree_node(node) -> str:
     open_attr = " open" if node.depth <= 2 else ""
     children = ""
     if node.children:
-        children = "<ul>" + "".join(render_tree_node(child) for child in node.children) + "</ul>"
+        children = "<ul>" + "".join(
+            render_tree_node(child, interactive=interactive) for child in node.children
+        ) + "</ul>"
+    selection = _call_attributes(node) if interactive else ""
     return (
-        f"<li><details{open_attr}><summary>{esc(short(node.signature, 90))}"
+        f"<li><details{open_attr}><summary{selection}>{esc(short(node.signature, 90))}"
         f"{badges}{outcome}</summary>{children}</details></li>"
     )
 
 
-def render_tree(report) -> str:
-    roots = "".join(render_tree_node(root) for root in report.roots)
+def render_tree(report, *, interactive: bool = False) -> str:
+    roots = "".join(render_tree_node(root, interactive=interactive) for root in report.roots)
     return (
         '<h3 class="rl-section">Call tree</h3>'
         '<div class="rl-legend">Each node is one invocation. Expand a node to inspect its children.</div>'
@@ -123,7 +130,7 @@ def _node_style(node) -> Tuple[str, str, str, str, str]:
     return "#ffffff", "#d8d5cc", "#185fa5", "#242424", ""
 
 
-def render_expanded_tree(report, limit: int = 120) -> str:
+def render_expanded_tree(report, limit: int = 120, *, interactive: bool = False) -> str:
     """Render every selected invocation as a compact, fully visible SVG tree."""
 
     selected = []
@@ -184,8 +191,9 @@ def render_expanded_tree(report, limit: int = 120) -> str:
             node_id: (x + shift, y) for node_id, (x, y) in positions.items()
         }
     height = max(140.0, 30 + maximum_depth * level_gap + node_height / 2 + 28)
+    role = "group" if interactive else "img"
     parts = [
-        f'<svg role="img" aria-label="Fully expanded recursion tree for {esc(report.function_name)}" '
+        f'<svg role="{role}" aria-label="Fully expanded recursion tree for {esc(report.function_name)}" '
         f'viewBox="0 0 {width:.0f} {height:.0f}" width="{width:.0f}" height="{height:.0f}" '
         'xmlns="http://www.w3.org/2000/svg">',
         f"<title>{esc(report.function_name)} expanded call tree</title>",
@@ -198,8 +206,13 @@ def render_expanded_tree(report, limit: int = 120) -> str:
             start_y = parent_y + node_height / 2
             end_y = child_y - node_height / 2
             middle = (start_y + end_y) / 2
+            selection = ""
+            if interactive:
+                selection = (
+                    f' data-parent-call-id="{parent.call_id}" data-child-call-id="{child.call_id}"'
+                )
             parts.append(
-                f'<path class="rl-expanded-edge" d="M{parent_x:.1f},{start_y:.1f} '
+                f'<path class="rl-expanded-edge"{selection} d="M{parent_x:.1f},{start_y:.1f} '
                 f'C{parent_x:.1f},{middle:.1f} {child_x:.1f},{middle:.1f} '
                 f'{child_x:.1f},{end_y:.1f}" fill="none" stroke="#c6c3ba" '
                 'stroke-width="1.2"/>'
@@ -233,7 +246,8 @@ def render_expanded_tree(report, limit: int = 120) -> str:
             label_y = y + 4.3
             value_y = None
 
-        parts.append(f'<g class="rl-expanded-node"><title>{esc(" · ".join(note))}</title>')
+        selection = _call_attributes(node) if interactive else ""
+        parts.append(f'<g class="rl-expanded-node"{selection}><title>{esc(" · ".join(note))}</title>')
         parts.append(
             f'<rect x="{left:.1f}" y="{y - node_height / 2:.1f}" '
             f'width="{widths[id(node)]:.1f}" height="{node_height:.1f}" rx="9" '
@@ -288,7 +302,7 @@ def dag_depths(nodes: List[DAGNode]) -> Dict[str, int]:
     return {node.identity: depth(node.identity, set()) for node in nodes}
 
 
-def render_dag(report) -> str:
+def render_dag(report, *, interactive: bool = False) -> str:
     nodes = report.dag_nodes
     omitted = max(0, len(nodes) - 40)
     nodes = nodes[:40]
@@ -311,11 +325,13 @@ def render_dag(report) -> str:
 
     width = max(600, 40 + (max(layers, default=0) + 1) * horizontal_gap)
     height = max(130, 60 + max((len(layer) for layer in layers.values()), default=1) * vertical_gap)
+    role = "group" if interactive else "img"
+    arrow = "rl-explorer-arrow" if interactive else "rl-arrow"
     parts = [
-        f'<svg role="img" aria-label="Subproblem DAG for {esc(report.function_name)}" '
+        f'<svg role="{role}" aria-label="Subproblem DAG for {esc(report.function_name)}" '
         f'viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
         'xmlns="http://www.w3.org/2000/svg">',
-        "<defs><marker id=\"rl-arrow\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" "
+        f'<defs><marker id="{arrow}" viewBox="0 0 10 10" refX="8" refY="5" '
         'markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" '
         'fill="none" stroke="#888780" stroke-width="1.5"/></marker></defs>',
     ]
@@ -328,7 +344,7 @@ def render_dag(report) -> str:
         tx, ty = positions[target]
         parts.append(
             f'<path d="M{sx + box_width},{sy + box_height / 2} L{tx - 8},{ty + box_height / 2}" '
-            'fill="none" stroke="#888780" stroke-width="1" marker-end="url(#rl-arrow)"/>'
+            f'fill="none" stroke="#888780" stroke-width="1" marker-end="url(#{arrow})"/>'
         )
 
     for node in nodes:
@@ -341,6 +357,10 @@ def render_dag(report) -> str:
             fill, stroke, text = "#e6f1fb", "#185fa5", "#042c53"
         label = esc(short(node.signature, 29))
         count = f"calls {node.calls} · executed {node.executed} · cached {node.cached}"
+        if interactive:
+            parts.append(
+                f'<g data-subproblem-id="{esc(node.identity)}"><title>{esc(node.signature)}</title>'
+            )
         parts.extend(
             [
                 f'<rect x="{x}" y="{y}" width="{box_width}" height="{box_height}" rx="8" '
@@ -349,6 +369,8 @@ def render_dag(report) -> str:
                 f'<text x="{x + 10}" y="{y + 39}" font-family="sans-serif" font-size="10" fill="{text}">{esc(count)}</text>',
             ]
         )
+        if interactive:
+            parts.append("</g>")
     parts.append("</svg>")
 
     notice = f'<p class="rl-note">Showing the first 40 subproblems; {omitted} omitted.</p>' if omitted else ""
@@ -359,11 +381,11 @@ def render_dag(report) -> str:
     )
 
 
-def render_report(report, mode: str = "tree") -> str:
+def render_report(report, mode: str = "tree", *, interactive: bool = False) -> str:
     views = {"tree": render_tree, "dag": render_dag, "expanded": render_expanded_tree}
     if mode not in views:
         raise ValueError("mode must be 'tree', 'dag', or 'expanded'")
-    body = views[mode](report)
+    body = views[mode](report, interactive=interactive)
     return f'<style>{_CSS}</style><section class="rl-wrap">{report_header(report)}{body}</section>'
 
 
