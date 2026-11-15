@@ -4,7 +4,7 @@
 
 **See not just what recursion returns, but where the repeated work happens.**
 
-**Try it in the browser:** https://ziyujiang07.github.io/recursionlens/ — every view and the line-by-line player run client-side with Pyodide, no installation. The examples menu collects every recursive function found in the CS1302A lectures.
+[Try RecursionLens in the browser](https://ziyujiang07.github.io/recursionlens/). The playground runs CS1302A examples with Pyodide and needs no installation. Follow a call from the tree to the subproblem graph, then jump to the calls behind a Recursion Doctor finding. [Browser walkthrough](#inspect-a-call-in-the-browser)
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 
@@ -139,13 +139,15 @@ trace.steps[0].frames        # stack snapshot for one step
 
 ## Inspect a call in the browser
 
-From the repository root, run `python -m http.server 8000`. Open [the local playground](http://localhost:8000) and run the default `fib(5)` example.
+[Open the online playground](https://ziyujiang07.github.io/recursionlens/) and wait for the default `fib(5)` trace to load.
 
-1. In **Call tree** or **Expanded tree**, select a `fib(2)` call. **Call path** shows how that invocation was reached, for example `fib(5) → fib(4) → fib(3) → fib(2)`.
-2. Switch to **Subproblem DAG** to see the same subproblem as one node. The other occurrences let you trace the same computation back through different branches of the call tree.
-3. Open **Recursion Doctor** and follow a finding to the calls that support it. The Doctor looks for repeated subproblems on different branches and calls that re-enter an identical subproblem already on the active path. If the trace is partial, its findings cover only the recorded calls.
+1. Open **Expanded tree** and click a `fib(2)` node. The **Trace inspector** shows its call path. One path is `fib(5) → fib(4) → fib(3) → fib(2)`. In **Call tree**, use the **Inspect** button next to a call.
+2. Click **Show in DAG**. The three calls to `fib(2)` share one subproblem node. Select an entry under **Recorded calls** to jump back to that invocation in the tree.
+3. Open **Recursion Doctor**. Find the entry for repeated `fib(2)` work and click a **Show call** button to see the evidence in the tree.
 
-Doctor findings describe what was observed for the selected input. Re-entering an active subproblem is a prompt to check the stopping condition or the arguments passed to the recursive call. Repetition across branches is a reason to investigate memoization when the function is deterministic and has no side effects.
+The Doctor reports what it observed in the recorded calls for the selected input. If a call re-enters a subproblem that is still on the stack, check the stopping condition and recursive arguments. For functions whose results depend only on their arguments and that have no side effects, repeated work across branches is a reason to investigate memoization.
+
+To preview a local checkout, run `python -m http.server 8000` from the repository root and open [the local playground](http://localhost:8000).
 
 ## Export a report
 

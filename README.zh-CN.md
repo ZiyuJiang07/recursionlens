@@ -4,7 +4,7 @@
 
 **不只看递归返回了什么，还要看到重复计算发生在哪里。**
 
-**在线试用：** https://ziyujiang07.github.io/recursionlens/ —— 所有视图和逐行播放器都在浏览器里用 Pyodide 运行，无需安装。示例菜单收录了 CS1302A 课件里出现的全部递归函数。
+[在浏览器中打开 RecursionLens](https://ziyujiang07.github.io/recursionlens/)。网页用 Pyodide 运行 CS1302A 课程示例，无需安装。你可以从调用树跳到子问题依赖图，也可以从 Recursion Doctor 的提示跳回对应的调用。[浏览器操作指南](#在浏览器里追踪一次调用)
 
 RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab 中观察递归执行过程。它把一次追踪转换成可展开的调用树、压缩后的子问题 DAG，以及 naive 与 memoized 的定量对比。
 
@@ -139,13 +139,15 @@ trace.steps[0].frames        # 某一步的栈帧快照
 
 ## 在浏览器里追踪一次调用
 
-在仓库根目录运行 `python -m http.server 8000`，打开[本地演示](http://localhost:8000)，运行默认示例 `fib(5)`。
+[打开在线演示](https://ziyujiang07.github.io/recursionlens/)，等默认示例 `fib(5)` 的运行记录加载完成。
 
-1. 在 **Call tree**（调用树）或 **Expanded tree**（展开的调用树）中选中一次 `fib(2)` 调用。**Call path** 会显示它是怎么被调用的，例如 `fib(5) → fib(4) → fib(3) → fib(2)`。
-2. 切到 **Subproblem DAG**（子问题依赖图），看这些调用如何合并成一个节点。查看其他调用位置时，可以沿调用树中不同的分支追溯同一个子问题。
-3. 打开 **Recursion Doctor**（递归诊断），点击提示，查看对应的调用。它会查找不同分支中重复出现的子问题，以及子问题尚未返回就沿当前调用链再次进入的情况。如果记录被截断，诊断只基于已记录的调用。
+1. 打开 **Expanded tree**（展开的调用树），点一个 `fib(2)` 节点。右侧 **Trace inspector** 会显示完整调用路径，其中一条是 `fib(5) → fib(4) → fib(3) → fib(2)`。在 **Call tree**（调用树）中，也可以点调用旁的 **Inspect**。
+2. 点 **Show in DAG**。三次 `fib(2)` 调用会合并成一个子问题节点。在 **Recorded calls** 中选一次调用，就能跳回它在调用树里的位置。
+3. 打开 **Recursion Doctor**（递归诊断），找到 `fib(2)` 重复计算的提示，点 **Show call** 查看调用树上的证据。
 
-诊断描述的是本次输入下观察到的现象。沿当前调用链再次进入同一子问题时，可以检查停止条件和传给递归调用的参数。若函数的结果只由参数决定且没有副作用，跨分支的重复计算值得进一步用记忆化来对比。
+诊断基于本次输入下已记录的调用。如果某个子问题还没返回就再次被调用，可以检查停止条件和传给递归调用的参数。若函数的结果只由参数决定且没有副作用，可以用记忆化来对比跨分支的重复计算。
+
+要预览本地版本，在仓库根目录运行 `python -m http.server 8000`，然后打开[本地演示](http://localhost:8000)。
 
 ## 导出报告
 
