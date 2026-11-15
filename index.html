@@ -38,16 +38,33 @@
           <span>Input call</span>
           <input id="call" value="fib(5)" spellcheck="false" autocomplete="off">
         </label>
-        <button id="run" class="primary" disabled>Run</button>
+        <div class="run-actions">
+          <button id="run" class="primary" disabled>Run</button>
+          <button id="predict" aria-haspopup="dialog" disabled>Predict cache savings</button>
+        </div>
         <div id="status" class="status" role="status">Loading Python…</div>
         <label class="field">
-          <span>Examples from the CS1302A lectures</span>
+          <span>Examples and exercises</span>
           <select id="example"></select>
         </label>
         <div id="example-note" class="hint"></div>
       </div>
     </div>
   </section>
+
+  <dialog id="prediction-dialog" class="card prediction-dialog" aria-labelledby="prediction-title">
+    <form id="prediction-form">
+      <h2 id="prediction-title">Predict cache savings</h2>
+      <p>How many function body executions will memoization save for <code id="prediction-call"></code>?</p>
+      <p class="trace-note">Use a function without its own cache, whose result depends only on its arguments and which has no side effects.</p>
+      <label class="field" for="prediction-value">Executions saved</label>
+      <input id="prediction-value" type="number" inputmode="numeric" min="0" max="9007199254740991" step="1" required autofocus>
+      <div class="trace-actions">
+        <button type="submit" class="primary">Run and check</button>
+        <button type="button" id="prediction-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
 
   <div id="results" hidden>
   <section id="metrics" class="metrics" aria-label="Run metrics"></section>

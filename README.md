@@ -4,7 +4,7 @@
 
 **See not just what recursion returns, but where the repeated work happens.**
 
-[Try RecursionLens in the browser](https://ziyujiang07.github.io/recursionlens/). The playground runs CS1302A examples with Pyodide and needs no installation. Follow a call from the tree to the subproblem graph, then jump to the calls behind a Recursion Doctor finding. [Browser walkthrough](#inspect-a-call-in-the-browser)
+[Try RecursionLens in the browser](https://ziyujiang07.github.io/recursionlens/). The playground runs CS1302A examples with Pyodide and needs no installation. Follow a call from the tree to the subproblem graph, inspect a Recursion Doctor finding, or [predict how much memoization will save](#predict-cache-savings). [Browser walkthrough](#inspect-a-call-in-the-browser)
 
 RecursionLens is a zero-runtime-dependency Python package for exploring recursive execution in JupyterLab. It turns a traced run into an expandable call tree, a compressed subproblem DAG, and a quantitative naive-versus-memoized comparison.
 
@@ -148,6 +148,21 @@ trace.steps[0].frames        # stack snapshot for one step
 The Doctor reports what it observed in the recorded calls for the selected input. If a call re-enters a subproblem that is still on the stack, check the stopping condition and recursive arguments. For functions whose results depend only on their arguments and that have no side effects, repeated work across branches is a reason to investigate memoization.
 
 To preview a local checkout, run `python -m http.server 8000` from the repository root and open [the local playground](http://localhost:8000).
+
+## Predict cache savings
+
+1. Use the default `fib(5)` or choose **Grid paths** under **Examples and exercises** to load `paths(3, 3)`.
+2. Click **Predict cache savings** and enter how many function body executions you expect memoization to skip.
+3. Press **Run and check** to see your guess next to the measured savings in **Compare**. The feedback shows the number of executions in both runs and how often the memoized run reused a result.
+
+The exercise checks predictions when both runs have complete traces and matching return values. Use a function without its own cache, whose result depends only on its arguments and which has no side effects. For **Grid paths**, different orders of moving right and down can leave the same number of steps in each direction.
+
+<details>
+<summary>Check the grid path result</summary>
+
+`paths(3, 3)` returns 20 routes. Memoization reduces function body executions from 39 to 15, saving 24 executions with 4 cache hits.
+
+</details>
 
 ## Export a report
 

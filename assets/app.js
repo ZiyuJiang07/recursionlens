@@ -84,10 +84,11 @@ async function showBuild() {
 
 /* ---------------------------------------------------------------- run */
 
-async function run() {
+async function run(prediction = null) {
   if (!state.runPayload) return;
   const button = el("run");
   button.disabled = true;
+  el("predict").disabled = true;
   clearResults();
   setStatus("running…");
 
@@ -116,7 +117,13 @@ async function run() {
     loadTrace(data.trace);
     renderDoctor(data.doctor || []);
     el("results").hidden = false;
-    switchTab(state.view);
+    if (prediction === null) {
+      switchTab(state.view);
+    } else {
+      const feedback = renderPrediction(prediction, data.comparison);
+      switchTab("compare");
+      feedback.focus();
+    }
 
     const slider = el("slider");
     slider.max = Math.max(0, state.steps.length - 1);
@@ -136,6 +143,7 @@ async function run() {
     setStatus(String(error), true);
   } finally {
     button.disabled = false;
+    el("predict").disabled = false;
   }
 }
 
@@ -169,6 +177,44 @@ function renderMetrics(metrics) {
     const value = metrics && metrics[key] !== undefined ? metrics[key] : "–";
     return `<div class="metric"><div class="k">${label}</div><div class="v">${value}</div></div>`;
   }).join("");
+}
+
+function renderPrediction(guess, comparison) {
+  const card = element("section", undefined, "card prediction-result");
+  card.tabIndex = -1;
+  card.setAttribute("aria-labelledby", "prediction-result-title");
+  const heading = element("h2", "Cache savings prediction");
+  heading.id = "prediction-result-title";
+  card.append(heading);
+
+  if (!comparison?.same_result || comparison.left.truncated || comparison.right.truncated) {
+    card.append(element("p", "A prediction needs two complete runs with matching results."));
+  } else {
+    const before = comparison.left.executed_calls;
+    const after = comparison.right.executed_calls;
+    const saved = before - after;
+    if (saved < 0) {
+      card.append(element("p", "The memoized run executed more function bodies. Inspect the comparison below."));
+    } else {
+      heading.textContent = guess === saved ? "Prediction correct" : "Prediction checked";
+      card.append(element("p", `You guessed ${guess}. This run saved ${saved} function body executions (${before} → ${after}).`));
+      card.append(element("p", `The memoized run recorded ${comparison.right.cached_calls} cache hits. A cache hit skips the function body and any recursive calls it would make.`, "trace-note"));
+    }
+  }
+  el("panel-compare").prepend(card);
+  return card;
+}
+
+function openPrediction() {
+  const call = el("call").value.trim();
+  if (!call) {
+    setStatus("Enter a function call before making a prediction.", true);
+    el("call").focus();
+    return;
+  }
+  el("prediction-call").textContent = call;
+  el("prediction-value").value = "";
+  el("prediction-dialog").showModal();
 }
 
 /* -------------------------------------------------------------- player */
@@ -693,7 +739,15 @@ function populateExamples() {
 function wire() {
   el("code").addEventListener("input", markResultsStale);
   el("call").addEventListener("input", markResultsStale);
-  el("run").addEventListener("click", run);
+  el("run").addEventListener("click", () => run());
+  el("predict").addEventListener("click", openPrediction);
+  el("prediction-cancel").addEventListener("click", () => el("prediction-dialog").close());
+  el("prediction-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const guess = el("prediction-value").valueAsNumber;
+    el("prediction-dialog").close();
+    run(guess);
+  });
   el("call").addEventListener("keydown", (event) => {
     if (event.key === "Enter") run();
   });
@@ -723,7 +777,7 @@ function wire() {
 
   document.addEventListener("keydown", (event) => {
     if (state.view !== "step" || !state.steps.length) return;
-    if (event.defaultPrevented || event.target.closest("textarea, input, select, #tabs")) return;
+    if (event.defaultPrevented || event.target.closest("textarea, input, select, dialog, #tabs")) return;
     if (event.key === "ArrowRight") renderStep(state.index + 1);
     if (event.key === "ArrowLeft") renderStep(state.index - 1);
   });

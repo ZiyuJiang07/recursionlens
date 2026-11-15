@@ -4,7 +4,7 @@
 
 **不只看递归返回了什么，还要看到重复计算发生在哪里。**
 
-[在浏览器中打开 RecursionLens](https://ziyujiang07.github.io/recursionlens/)。网页用 Pyodide 运行 CS1302A 课程示例，无需安装。你可以从调用树跳到子问题依赖图，也可以从 Recursion Doctor 的提示跳回对应的调用。[浏览器操作指南](#在浏览器里追踪一次调用)
+[在浏览器中打开 RecursionLens](https://ziyujiang07.github.io/recursionlens/)。网页用 Pyodide 运行 CS1302A 课程示例，无需安装。你可以查看调用路径和 Recursion Doctor 的诊断依据，也可以[预测记忆化能省多少次计算](#预测记忆化能省多少次计算)。[浏览器操作指南](#在浏览器里追踪一次调用)
 
 RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab 中观察递归执行过程。它把一次追踪转换成可展开的调用树、压缩后的子问题 DAG，以及 naive 与 memoized 的定量对比。
 
@@ -148,6 +148,21 @@ trace.steps[0].frames        # 某一步的栈帧快照
 诊断基于本次输入下已记录的调用。如果某个子问题还没返回就再次被调用，可以检查停止条件和传给递归调用的参数。若函数的结果只由参数决定且没有副作用，可以用记忆化来对比跨分支的重复计算。
 
 要预览本地版本，在仓库根目录运行 `python -m http.server 8000`，然后打开[本地演示](http://localhost:8000)。
+
+## 预测记忆化能省多少次计算
+
+1. 使用默认示例 `fib(5)`，或在 **Examples and exercises**（示例与练习）里选 **Grid paths**，加载 `paths(3, 3)`。
+2. 点 **Predict cache savings**，输入你预计开启记忆化后少执行的函数体次数。
+3. 点 **Run and check**。**Compare** 会显示你的预测和实测结果，包括两次运行各执行了多少次函数体，以及缓存被命中了几次。
+
+两次运行的记录完整且返回值一致时，网页会核对预测。请选择本身没有缓存、结果只取决于参数且没有副作用的函数。网格路径中，向右和向下的顺序可以不同，却可能剩下相同的步数。
+
+<details>
+<summary>查看网格路径的结果</summary>
+
+`paths(3, 3)` 返回 20 条路径。开启记忆化后，实际执行函数体的次数从 39 次降到 15 次，省了 24 次，共命中缓存 4 次。
+
+</details>
 
 ## 导出报告
 

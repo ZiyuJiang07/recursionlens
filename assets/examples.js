@@ -68,5 +68,12 @@ window.RL_EXAMPLES = [
     "call": "_(10, 0, 10)",
     "note": "binary search on the interval [a, b)",
     "code": "def _(n, a, b):\n    if a ** 2 <= n < b ** 2:\n        if a + 1 == b:\n            return a\n        c = (a + b) // 2\n        return _(n, a, c) or _(n, c, b)\n"
+  },
+  {
+    "lecture": "Practice",
+    "name": "Grid paths",
+    "call": "paths(3, 3)",
+    "note": "Move only right or down. Different move orders can reach the same remaining steps.",
+    "code": "def paths(right, down):\n    if right < 0 or down < 0:\n        return 0\n    if right == 0 or down == 0:\n        return 1\n    return paths(right - 1, down) + paths(right, down - 1)\n"
   }
 ];

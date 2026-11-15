@@ -60,6 +60,7 @@ def _run(code: str, call: str) -> dict:
     compiled = compile(code, "<web>", "exec")
 
     run_error = None
+    comparison_metrics = None
     with contextlib.redirect_stdout(io.StringIO()):
         target, args, kwargs = _prepare_call(compiled, expression)
         try:
@@ -80,7 +81,9 @@ def _run(code: str, call: str) -> dict:
                 error = html.escape(_message(exc))
                 comparison_html = f'<p class="hint">Comparison unavailable: {error}</p>'
             else:
-                comparison_html = report.compare(memoized).to_html()
+                comparison = report.compare(memoized)
+                comparison_html = comparison.to_html()
+                comparison_metrics = comparison.to_dict()
 
     tutor = record_tutor(code, call)
     steps = []
@@ -111,6 +114,7 @@ def _run(code: str, call: str) -> dict:
             "dag": render_report(report, mode="dag", interactive=True),
             "compare": comparison_html,
         },
+        "comparison": comparison_metrics,
         "metrics": report.metrics(),
         "result": report.result,
         "run_error": run_error,
