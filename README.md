@@ -181,7 +181,7 @@ Version 0.1 targets synchronous, deterministic teaching examples such as factori
 
 - Memoization requires hashable bound arguments; unhashable arguments produce a warning instead of a crash.
 - Identical arguments do not necessarily imply redundant work for functions with side effects or external state.
-- `max_calls` bounds the stored tree without changing the function's result. A truncated report explicitly marks partial tree/DAG metrics.
+- `max_calls` caps the stored call tree. Observed calls, executed bodies, and cache hits cover the full run. After truncation, tree and DAG metrics describe the recorded calls.
 - RecursionLens executes your function; it is **not a sandbox for untrusted code**.
 - Async functions, generators, automatic Big-O inference, and automatic code rewriting are non-goals for 0.1.
 

@@ -22,6 +22,9 @@ class TraceReport:
     truncated: bool = False
     warnings: List[str] = field(default_factory=list)
     succeeded: bool = True
+    # Reports constructed without runtime counts can still use their recorded nodes.
+    _executed_calls: Optional[int] = field(default=None, repr=False, compare=False)
+    _cached_calls: Optional[int] = field(default=None, repr=False, compare=False)
 
     @property
     def recorded_calls(self) -> int:
@@ -29,10 +32,14 @@ class TraceReport:
 
     @property
     def cached_calls(self) -> int:
+        if self._cached_calls is not None:
+            return self._cached_calls
         return sum(node.cached for node in self.nodes)
 
     @property
     def executed_calls(self) -> int:
+        if self._executed_calls is not None:
+            return self._executed_calls
         return self.recorded_calls - self.cached_calls
 
     @property

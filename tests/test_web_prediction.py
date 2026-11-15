@@ -35,3 +35,18 @@ def test_failed_run_does_not_provide_a_prediction_answer():
 
     assert "ZeroDivisionError" in payload["run_error"]
     assert payload["comparison"] is None
+
+
+def test_truncated_tree_still_provides_exact_prediction_counts():
+    code = "def fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)\n"
+    payload = json.loads(run_payload(code, "fib(14)"))
+    comparison = payload["comparison"]
+
+    assert payload["result"] == "377"
+    assert payload["metrics"]["truncated"]
+    assert payload["metrics"]["recorded_calls"] == 1_000
+    assert payload["metrics"]["executed_calls"] == 1_219
+    assert comparison["same_result"]
+    assert comparison["left"]["executed_calls"] == 1_219
+    assert comparison["right"]["executed_calls"] == 15
+    assert comparison["delta"]["executed_calls"] == -1_204

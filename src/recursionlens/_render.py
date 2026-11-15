@@ -41,6 +41,8 @@ def metric_cards(report) -> str:
         ("Repeated calls", report.repeated_calls),
         ("Maximum depth", report.max_depth),
     ]
+    if report.truncated:
+        metrics.append(("Recorded calls", report.recorded_calls))
     cards = "".join(
         f'<div class="rl-metric"><div class="rl-metric-label">{esc(label)}</div>'
         f'<div class="rl-metric-value">{esc(value)}</div></div>'
@@ -61,7 +63,7 @@ def report_header(report) -> str:
     if report.truncated:
         warnings += (
             '<div class="rl-warning">The recording limit was reached. '
-            "Tree and DAG metrics only include recorded nodes; observed calls still counts every call.</div>"
+            "Tree and DAG metrics describe the recorded calls.</div>"
         )
     return (
         f'<h2 class="rl-title">RecursionLens · {esc(report.function_name)}</h2>'

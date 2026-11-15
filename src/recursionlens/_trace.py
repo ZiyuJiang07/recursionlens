@@ -94,6 +94,8 @@ class TraceRecorder:
         self.identities: Counter = Counter()
         self.cache: Dict[Tuple[Any, ...], Any] = {}
         self.total_calls = 0
+        self.executed_calls = 0
+        self.cached_calls = 0
         self.depth = 0
         self.max_depth = 0
         self.truncated = False
@@ -147,6 +149,7 @@ def _invoke(
     if recorder.memoize and cache_key is not None and cache_key in recorder.cache:
         try:
             value = recorder.cache[cache_key]
+            recorder.cached_calls += 1
             node = recorder.add_node(identity, signature, "cached")
             if node is not None:
                 node.result = safe_repr(value)
@@ -157,6 +160,7 @@ def _invoke(
     node = recorder.add_node(identity, signature, "running")
     recorder.stack.append(node)
     try:
+        recorder.executed_calls += 1
         value = func(*args, **kwargs)
         if node is not None:
             node.status = "returned"
@@ -280,4 +284,6 @@ def _make_report(
         truncated=recorder.truncated,
         warnings=list(recorder.warnings),
         succeeded=succeeded,
+        _executed_calls=recorder.executed_calls,
+        _cached_calls=recorder.cached_calls,
     )

@@ -88,13 +88,18 @@ def test_exception_is_recorded_and_reraised():
     assert factorial(3) == 6
 
 
-def test_truncation_preserves_result():
-    complete = fib.run(5)
-    limited = fib.with_options(max_calls=4).run(5)
+@pytest.mark.parametrize(
+    ("memoize", "executed_calls", "cached_calls"),
+    [(False, 15, 0), (True, 6, 3)],
+)
+def test_truncation_preserves_result_and_call_totals(memoize, executed_calls, cached_calls):
+    limited = fib.with_options(memoize=memoize, max_calls=4).run(5)
 
-    assert limited.value == complete.value
+    assert limited.value == 5
     assert limited.recorded_calls == 4
-    assert limited.total_calls == 15
+    assert limited.total_calls == executed_calls + cached_calls
+    assert limited.executed_calls == executed_calls
+    assert limited.cached_calls == cached_calls
     assert limited.truncated is True
 
 

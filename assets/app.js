@@ -173,7 +173,10 @@ const METRIC_LABELS = [
 
 function renderMetrics(metrics) {
   const host = el("metrics");
-  host.innerHTML = METRIC_LABELS.map(([key, label]) => {
+  const labels = metrics?.truncated
+    ? [...METRIC_LABELS, ["recorded_calls", "Recorded calls"]]
+    : METRIC_LABELS;
+  host.innerHTML = labels.map(([key, label]) => {
     const value = metrics && metrics[key] !== undefined ? metrics[key] : "–";
     return `<div class="metric"><div class="k">${label}</div><div class="v">${value}</div></div>`;
   }).join("");
@@ -187,8 +190,8 @@ function renderPrediction(guess, comparison) {
   heading.id = "prediction-result-title";
   card.append(heading);
 
-  if (!comparison?.same_result || comparison.left.truncated || comparison.right.truncated) {
-    card.append(element("p", "A prediction needs two complete runs with matching results."));
+  if (!comparison?.same_result) {
+    card.append(element("p", "A prediction needs two successful runs with matching results."));
   } else {
     const before = comparison.left.executed_calls;
     const after = comparison.right.executed_calls;
@@ -198,7 +201,7 @@ function renderPrediction(guess, comparison) {
     } else {
       heading.textContent = guess === saved ? "Prediction correct" : "Prediction checked";
       card.append(element("p", `You guessed ${guess}. This run saved ${saved} function body executions (${before} → ${after}).`));
-      card.append(element("p", `The memoized run recorded ${comparison.right.cached_calls} cache hits. A cache hit skips the function body and any recursive calls it would make.`, "trace-note"));
+      card.append(element("p", `The memoized run had ${comparison.right.cached_calls} cache hits. A cache hit skips the function body and any recursive calls it would make.`, "trace-note"));
     }
   }
   el("panel-compare").prepend(card);
