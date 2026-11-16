@@ -82,6 +82,7 @@
     <button id="tab-expanded" data-tab="expanded" role="tab" aria-controls="panel-expanded" aria-selected="false" tabindex="-1">Expanded tree</button>
     <button id="tab-dag" data-tab="dag" role="tab" aria-controls="panel-dag" aria-selected="false" tabindex="-1">Subproblem DAG</button>
     <button id="tab-compare" data-tab="compare" role="tab" aria-controls="panel-compare" aria-selected="false" tabindex="-1">Compare</button>
+    <button id="tab-growth" data-tab="growth" role="tab" aria-controls="panel-growth" aria-selected="false" tabindex="-1">Growth</button>
     <button id="tab-doctor" data-tab="doctor" role="tab" aria-controls="panel-doctor" aria-selected="false" tabindex="-1">Recursion Doctor</button>
     <button id="tab-json" data-tab="json" role="tab" aria-controls="panel-json" aria-selected="false" tabindex="-1">JSON</button>
   </div>
@@ -121,6 +122,34 @@
   <section id="panel-expanded" class="panel" role="tabpanel" aria-labelledby="tab-expanded" hidden></section>
   <section id="panel-dag" class="panel" role="tabpanel" aria-labelledby="tab-dag" hidden></section>
   <section id="panel-compare" class="panel" role="tabpanel" aria-labelledby="tab-compare" hidden></section>
+  <section id="panel-growth" class="panel" role="tabpanel" aria-labelledby="tab-growth" hidden>
+    <div class="card growth-card">
+      <div class="growth-header">
+        <h2>Function executions by input size</h2>
+        <label class="field" for="growth-example">Built-in example
+          <select id="growth-example"></select>
+        </label>
+      </div>
+      <div id="growth-error" class="status error" role="status" hidden></div>
+      <div id="growth-output" hidden>
+        <p id="growth-summary" class="growth-summary" role="status"></p>
+        <div class="growth-legend">
+          <span>Without memoization</span>
+          <span class="growth-cached">With memoization</span>
+        </div>
+        <canvas id="growth-chart" role="img" aria-label="Function executions with and without memoization by input size" aria-describedby="growth-summary"></canvas>
+        <details class="growth-details">
+          <summary>Exact counts</summary>
+          <table class="growth-table">
+            <thead>
+              <tr><th scope="col">Input call</th><th scope="col">Without memoization</th><th scope="col">With memoization</th></tr>
+            </thead>
+            <tbody id="growth-counts"></tbody>
+          </table>
+        </details>
+      </div>
+    </div>
+  </section>
   <section id="panel-doctor" class="panel" role="tabpanel" aria-labelledby="tab-doctor" hidden></section>
   <section id="panel-json" class="panel" role="tabpanel" aria-labelledby="tab-json" hidden>
     <div class="card inner"><pre id="jsonout" class="jsonout"></pre></div>

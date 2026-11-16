@@ -166,6 +166,12 @@ The exercise checks predictions when both runs finish successfully with matching
 
 </details>
 
+## Compare growth across input sizes
+
+Open **Growth** in the browser playground and select **fibonacci** or **Grid paths**. The two curves show measured function body executions with and without memoization. Each input size starts a fresh run for each curve. The **Exact counts** table lists the calls behind the points.
+
+Fibonacci uses inputs 1 through 12. On `fibonacci(12)`, memoization reduces body executions from **465 to 13**. Grid paths compares square grids from 0 to 6 on each side. The count drops from **1,847 to 48** for `paths(6, 6)`. [Open the playground](https://ziyujiang07.github.io/recursionlens/)
+
 ## Export a report
 
 ```python

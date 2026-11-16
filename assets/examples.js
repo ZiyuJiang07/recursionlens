@@ -20,6 +20,7 @@ window.RL_EXAMPLES = [
     "id": "fibonacci",
     "name": "fibonacci",
     "call": "fibonacci(6)",
+    "growth": {"start": 1, "stop": 12, "call": "fibonacci({n})"},
     "note": "",
     "code": "def fibonacci(n):\n    if n > 1:\n        return fibonacci(n - 1) + fibonacci(n - 2)  # recursion\n    elif n == 1:\n        return 1\n    else:\n        return 0\n"
   },
@@ -84,6 +85,7 @@ window.RL_EXAMPLES = [
     "id": "grid-paths",
     "name": "Grid paths",
     "call": "paths(3, 3)",
+    "growth": {"start": 0, "stop": 6, "call": "paths({n}, {n})"},
     "note": "Move only right or down. Different move orders can reach the same remaining steps.",
     "code": "def paths(right, down):\n    if right < 0 or down < 0:\n        return 0\n    if right == 0 or down == 0:\n        return 1\n    return paths(right - 1, down) + paths(right, down - 1)\n"
   }

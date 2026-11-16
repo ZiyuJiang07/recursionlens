@@ -15,6 +15,8 @@ const STEP_CONTROLS = ["first", "prev", "next", "last", "slider"];
 const state = {
   pyodide: null,
   runPayload: null,
+  growthPayload: null,
+  growthResult: null,
   source: "",
   steps: [],
   index: 0,
@@ -58,6 +60,7 @@ async function boot() {
     const bridge = await (await fetch("assets/bridge.py", { cache: "no-store" })).text();
     state.pyodide.runPython(bridge);
     state.runPayload = state.pyodide.globals.get("run_payload");
+    state.growthPayload = state.pyodide.globals.get("growth_payload");
 
     setStatus("ready");
     showBuild();
@@ -218,6 +221,141 @@ function openPrediction() {
   el("prediction-call").textContent = call;
   el("prediction-value").value = "";
   el("prediction-dialog").showModal();
+}
+
+/* ------------------------------------------------------- growth chart */
+
+function drawGrowthChart(samples) {
+  const canvas = el("growth-chart");
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const context = canvas.getContext("2d");
+  if (!width || !height || !context) return;
+
+  const density = window.devicePixelRatio || 1;
+  canvas.width = Math.round(width * density);
+  canvas.height = Math.round(height * density);
+  context.scale(density, density);
+
+  const left = 52;
+  const right = width - 16;
+  const top = 32;
+  const bottom = height - 40;
+  const firstSize = samples[0].size;
+  const lastSize = samples[samples.length - 1].size;
+  const maximum = Math.max(...samples.flatMap((sample) => [sample.naive, sample.memoized]));
+  const magnitude = Math.max(1, 10 ** Math.floor(Math.log10(maximum / 4)));
+  const tick = Math.ceil(maximum / (4 * magnitude)) * magnitude;
+  const ceiling = Math.ceil(maximum / tick) * tick;
+  const xAt = (size) => left + (right - left) * (size - firstSize) / Math.max(1, lastSize - firstSize);
+  const yAt = (count) => bottom - (bottom - top) * count / ceiling;
+
+  const style = getComputedStyle(canvas);
+  const color = (name) => style.getPropertyValue(name).trim();
+  context.font = "12px system-ui, sans-serif";
+  context.fillStyle = color("--muted");
+  context.textBaseline = "middle";
+  context.fillText("Function executions", left, 14);
+  context.textAlign = "right";
+  context.strokeStyle = color("--line");
+  for (let count = 0; count <= ceiling; count += tick) {
+    const y = yAt(count);
+    context.fillText(count.toLocaleString("en-US"), left - 8, y);
+    context.beginPath();
+    context.moveTo(left, y);
+    context.lineTo(right, y);
+    context.stroke();
+  }
+  context.textAlign = "center";
+  for (const sample of samples) {
+    context.fillText(sample.size, xAt(sample.size), bottom + 13);
+  }
+  context.fillText("Input size (n)", (left + right) / 2, height - 8);
+
+  const series = [
+    { key: "naive", color: color("--coral"), dash: [] },
+    { key: "memoized", color: color("--blue"), dash: [5, 4] },
+  ];
+  for (const line of series) {
+    context.strokeStyle = line.color;
+    context.fillStyle = line.color;
+    context.lineWidth = 2.5;
+    context.lineJoin = "round";
+    context.setLineDash(line.dash);
+    context.beginPath();
+    context.moveTo(xAt(firstSize), yAt(samples[0][line.key]));
+    for (const sample of samples.slice(1)) {
+      context.lineTo(xAt(sample.size), yAt(sample[line.key]));
+    }
+    context.stroke();
+    for (const sample of samples) {
+      context.beginPath();
+      context.arc(xAt(sample.size), yAt(sample[line.key]), 3, 0, 2 * Math.PI);
+      context.fill();
+    }
+  }
+}
+
+function showGrowth() {
+  const id = el("growth-example").value;
+  if (state.growthResult?.id === id) {
+    drawGrowthChart(state.growthResult.samples);
+    return;
+  }
+
+  const example = (window.RL_EXAMPLES || []).find((item) => item.id === id);
+  const status = el("growth-error");
+  const output = el("growth-output");
+  output.hidden = true;
+  status.hidden = true;
+  state.growthResult = null;
+  if (!example?.growth || !state.growthPayload) {
+    status.textContent = "Growth measurements are unavailable.";
+    status.hidden = false;
+    return;
+  }
+
+  try {
+    const { call, start, stop } = example.growth;
+    const data = JSON.parse(state.growthPayload(example.code, call, start, stop));
+    if (data.error) throw new Error(data.error);
+    const samples = data.samples;
+    const format = (count) => count.toLocaleString("en-US");
+    const last = samples[samples.length - 1];
+    el("growth-summary").textContent =
+      `${last.call} took ${format(last.naive)} function body executions without memoization and ${format(last.memoized)} with it.`;
+    const rows = samples.map((sample) => {
+      const row = element("tr");
+      const name = element("th");
+      name.scope = "row";
+      name.append(element("code", sample.call));
+      row.append(name, element("td", format(sample.naive)), element("td", format(sample.memoized)));
+      return row;
+    });
+    el("growth-counts").replaceChildren(...rows);
+    output.hidden = false;
+    state.growthResult = { id, samples };
+    drawGrowthChart(samples);
+  } catch (error) {
+    status.textContent = String(error.message ?? error);
+    status.hidden = false;
+  }
+}
+
+function wireGrowth() {
+  const select = el("growth-example");
+  for (const example of window.RL_EXAMPLES || []) {
+    if (!example.growth) continue;
+    const option = element("option", example.name);
+    option.value = example.id;
+    select.append(option);
+  }
+  select.addEventListener("change", showGrowth);
+  window.addEventListener("resize", () => {
+    if (state.view === "growth" && state.growthResult) {
+      drawGrowthChart(state.growthResult.samples);
+    }
+  });
 }
 
 /* -------------------------------------------------------------- player */
@@ -686,6 +824,7 @@ function switchTab(name) {
     el(button.getAttribute("aria-controls")).hidden = !active;
   });
   renderSelection();
+  if (name === "growth") showGrowth();
 }
 
 function populateExamples() {
@@ -810,6 +949,7 @@ function wire() {
   });
 
   populateExamples();
+  wireGrowth();
 
   document.addEventListener("keydown", (event) => {
     if (state.view !== "step" || !state.steps.length) return;

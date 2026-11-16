@@ -166,6 +166,12 @@ trace.steps[0].frames        # 某一步的栈帧快照
 
 </details>
 
+## 对比输入变大时的执行次数
+
+在网页演示中打开 **Growth**，选择 **fibonacci** 或 **Grid paths**。两条曲线显示开启记忆化前后的实测函数体执行次数。每个输入大小都各自从头运行，点 **Exact counts** 可查看每组输入和对应次数。
+
+Fibonacci 的输入从 1 到 12。运行 `fibonacci(12)` 时，开启记忆化后，执行次数从 **465 次降到 13 次**。网格路径比较两边等长的网格，边长从 0 到 6。运行 `paths(6, 6)` 时，执行次数从 **1,847 次降到 48 次**。[打开网页演示](https://ziyujiang07.github.io/recursionlens/)
+
 ## 导出报告
 
 ```python

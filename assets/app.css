@@ -159,7 +159,8 @@ button.primary:hover { background: #14508c; }
 
 .hint { font-size: 11px; color: var(--muted); min-height: 14px; }
 
-select#example {
+select#example,
+select#growth-example {
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 8px 10px;
@@ -169,7 +170,8 @@ select#example {
   color: var(--text);
   width: 100%;
 }
-select#example:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
+select#example:focus,
+select#growth-example:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
 #example-note:empty { display: none; }
 .example-share .run-actions { align-items: center; }
 #example-link { width: 100%; margin-top: 6px; }
@@ -195,6 +197,31 @@ select#example:focus { outline: 2px solid var(--blue-soft); border-color: var(--
 }
 
 .panel { margin-top: 4px; }
+
+.growth-card { padding: 16px; }
+.growth-header { display: flex; align-items: center; justify-content: space-between; gap: 8px 18px; flex-wrap: wrap; }
+.growth-header h2 { font-size: 18px; margin: 0; }
+.growth-header .field { min-width: min(170px, 100%); }
+.growth-summary { font-size: 13px; color: var(--text); margin: 8px 0 12px; }
+.growth-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+.growth-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.growth-legend span::before { content: ""; width: 22px; border-top: 3px solid var(--coral); }
+.growth-legend .growth-cached::before { border-top: 3px dashed var(--blue); }
+#growth-chart {
+  display: block;
+  width: 100%;
+  height: clamp(230px, 36vw, 330px);
+  background: #fbfaf6;
+  border: 1px solid #efede5;
+  border-radius: 10px;
+}
+.growth-details { margin: 12px 0 0; font-size: 13px; }
+.growth-details summary { color: var(--blue); cursor: pointer; }
+.growth-table { border-collapse: collapse; width: 100%; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.growth-table th, .growth-table td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: right; }
+.growth-table th:first-child { text-align: left; }
+.growth-table thead th { font-size: 12px; color: var(--muted); }
+.growth-table tbody th { font-weight: normal; }
 
 .player { display: flex; flex-direction: column; gap: 12px; }
 .player-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
