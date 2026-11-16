@@ -7806,6 +7806,10 @@ a.anchor-link {
 <p><strong>Web version:</strong> <a href="https://ziyujiang07.github.io/recursionlens/">https://ziyujiang07.github.io/recursionlens/</a> — every view and the line-by-line player run in the browser.
 Every public command on one page: the decorator, the report object, its three views, its metrics, memoization, comparison, export, and error handling.</p>
 <p>In the browser, you can follow a call path from the tree to the subproblem DAG and open the calls behind a Recursion Doctor finding. Try the <a href="https://github.com/ZiyuJiang07/recursionlens#inspect-a-call-in-the-browser">browser walkthrough</a> with <code>fib(5)</code>, then <a href="https://github.com/ZiyuJiang07/recursionlens#predict-cache-savings">predict the cache savings</a> for Grid paths.</p>
+<ul>
+<li>Select <strong>Grid paths</strong> under <strong>Examples and exercises</strong>, then click <strong>Copy example link</strong>. The copied URL loads the exercise with its original code and input. <a href="https://ziyujiang07.github.io/recursionlens/?example=grid-paths">Open Grid paths</a></li>
+<li>Open <strong>Growth</strong> and choose <strong>fibonacci</strong> or <strong>Grid paths</strong> to compare measured function body executions with and without memoization. Open <strong>Exact counts</strong> for the numbers at each input size. For <code>paths(6, 6)</code>, the count drops from <strong>1,847 to 48</strong>. <a href="https://github.com/ZiyuJiang07/recursionlens#compare-growth-across-input-sizes">Growth walkthrough</a></li>
+</ul>
 <div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>recursionlens
 </pre></div>
 <blockquote>
@@ -8574,14 +8578,14 @@ result: 3
 <td>top-level outcome</td>
 </tr>
 <tr>
-<td><code>report.total_calls</code>, <code>.recorded_calls</code>, <code>.executed_calls</code>, <code>.cached_calls</code></td>
+<td><code>report.total_calls</code>, <code>.executed_calls</code>, <code>.cached_calls</code>, <code>.max_depth</code></td>
 <td><code>int</code></td>
-<td>call counters</td>
+<td>whole-run call counts and depth</td>
 </tr>
 <tr>
-<td><code>report.unique_subproblems</code>, <code>.repeated_calls</code>, <code>.max_depth</code></td>
+<td><code>report.recorded_calls</code>, <code>.unique_subproblems</code>, <code>.repeated_calls</code></td>
 <td><code>int</code></td>
-<td>DAG and depth metrics</td>
+<td>counts from the stored call nodes</td>
 </tr>
 <tr>
 <td><code>report.dag_nodes</code> / <code>.dag_edges</code></td>

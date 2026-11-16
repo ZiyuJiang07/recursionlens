@@ -109,7 +109,7 @@ assert fib.last_report.total_calls == 15
 
 ## Step through a function line by line
 
-Version 0.2 adds a Python Tutor-style player that runs inside the notebook. Paste a function, choose the call, and step through it:
+Version 0.2.0 adds a Python Tutor-style player that runs inside the notebook. Paste a function, choose the call, and step through it:
 
 ```python
 from recursionlens import tutor
@@ -185,13 +185,13 @@ HTML reports are standalone files that can be opened without a notebook server. 
 
 ## Supported scope
 
-Version 0.1 targets synchronous, deterministic teaching examples such as factorial, Fibonacci, and pure mathematical recursion.
+Version 0.2.0 targets synchronous, deterministic teaching examples such as factorial, Fibonacci, and pure mathematical recursion.
 
 - Memoization requires hashable bound arguments; unhashable arguments produce a warning instead of a crash.
 - Identical arguments do not necessarily imply redundant work for functions with side effects or external state.
 - `max_calls` caps the stored call tree. Observed calls, executed bodies, and cache hits cover the full run. After truncation, tree and DAG metrics describe the recorded calls.
 - RecursionLens executes your function; it is **not a sandbox for untrusted code**.
-- Async functions, generators, automatic Big-O inference, and automatic code rewriting are non-goals for 0.1.
+- Async functions, generators, automatic Big-O inference, and automatic code rewriting are non-goals for 0.2.0.
 
 ## Documentation and demo
 

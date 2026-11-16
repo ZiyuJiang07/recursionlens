@@ -7806,6 +7806,10 @@ a.anchor-link {
 <p><strong>网页版：</strong> <a href="https://ziyujiang07.github.io/recursionlens/">https://ziyujiang07.github.io/recursionlens/</a> — 所有视图和逐行播放器都能直接在浏览器中运行。
 每个公开命令一页看完：装饰器、报告对象、三种视图、指标、memoization、对比、导出与错误处理。</p>
 <p>在网页里可以沿调用路径从调用树跳到子问题依赖图，也可以查看 Recursion Doctor 提示对应的调用。用 <code>fib(5)</code> 跟着<a href="https://github.com/ZiyuJiang07/recursionlens/blob/main/README.zh-CN.md#在浏览器里追踪一次调用">浏览器操作指南</a>试一遍，再用网格路径<a href="https://github.com/ZiyuJiang07/recursionlens/blob/main/README.zh-CN.md#预测记忆化能省多少次计算">预测记忆化能省多少次计算</a>。</p>
+<ul>
+<li>在 <strong>Examples and exercises</strong> 里选 <strong>Grid paths</strong>，再点 <strong>Copy example link</strong>。打开复制的链接会加载练习原有的代码和输入。<a href="https://ziyujiang07.github.io/recursionlens/?example=grid-paths">打开网格路径练习</a></li>
+<li>点 <strong>Growth</strong>，选择 <strong>fibonacci</strong> 或 <strong>Grid paths</strong>，对比多组输入在开启记忆化前后的函数体执行次数。展开 <strong>Exact counts</strong> 可查看每组输入的实测值。运行 <code>paths(6, 6)</code> 时，执行次数从 <strong>1,847 次降到 48 次</strong>。<a href="https://github.com/ZiyuJiang07/recursionlens/blob/main/README.zh-CN.md#对比输入变大时的执行次数">增长曲线操作指南</a></li>
+</ul>
 <div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>recursionlens
 </pre></div>
 <blockquote>
@@ -8574,14 +8578,14 @@ result: 3
 <td>顶层结果</td>
 </tr>
 <tr>
-<td><code>report.total_calls</code>、<code>.recorded_calls</code>、<code>.executed_calls</code>、<code>.cached_calls</code></td>
+<td><code>report.total_calls</code>、<code>.executed_calls</code>、<code>.cached_calls</code>、<code>.max_depth</code></td>
 <td><code>int</code></td>
-<td>调用计数</td>
+<td>整次运行的调用计数与深度</td>
 </tr>
 <tr>
-<td><code>report.unique_subproblems</code>、<code>.repeated_calls</code>、<code>.max_depth</code></td>
+<td><code>report.recorded_calls</code>、<code>.unique_subproblems</code>、<code>.repeated_calls</code></td>
 <td><code>int</code></td>
-<td>DAG 与深度指标</td>
+<td>基于已保存调用节点的计数</td>
 </tr>
 <tr>
 <td><code>report.dag_nodes</code> / <code>.dag_edges</code></td>
