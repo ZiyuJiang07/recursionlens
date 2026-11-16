@@ -693,11 +693,15 @@ function populateExamples() {
   const examples = window.RL_EXAMPLES || [];
   if (!select || !examples.length) return;
 
+  const copy = el("copy-example");
+  const linkStatus = el("example-link-status");
+  const linkField = el("example-link");
+  const examplesById = new Map(examples.map((item) => [item.id, item]));
   const groups = new Map();
-  examples.forEach((item, index) => {
+  for (const item of examples) {
     if (!groups.has(item.lecture)) groups.set(item.lecture, []);
-    groups.get(item.lecture).push({ ...item, index });
-  });
+    groups.get(item.lecture).push(item);
+  }
 
   select.innerHTML =
     '<option value="">Custom code…</option>' +
@@ -708,35 +712,64 @@ function populateExamples() {
           items
             .map(
               (item) =>
-                `<option value="${item.index}">${escapeHtml(item.name)} · ${escapeHtml(item.call)}</option>`,
+                `<option value="${item.id}">${escapeHtml(item.name)} · ${escapeHtml(item.call)}</option>`,
             )
             .join("") +
           "</optgroup>",
       )
       .join("");
 
-  const load = (index) => {
-    const item = examples[index];
-    if (!item) return;
-    select.value = String(index);
-    el("code").value = item.code;
-    el("call").value = item.call;
-    el("example-note").textContent = item.note || "";
-    run();
+  const selectExample = (item) => {
+    select.value = item?.id ?? "";
+    el("example-note").textContent = item?.note ?? "";
+    copy.disabled = !item;
+    linkStatus.textContent = "";
+    linkField.value = "";
+    linkField.hidden = true;
+
+    if (item) {
+      el("code").value = item.code;
+      el("call").value = item.call;
+      run();
+    }
   };
 
-  select.addEventListener("change", () => {
-    if (select.value !== "") load(Number(select.value));
+  select.addEventListener("change", () => selectExample(examplesById.get(select.value)));
+  const useCustomCode = () => {
+    if (select.value) selectExample();
+  };
+  el("code").addEventListener("input", useCustomCode);
+  el("call").addEventListener("input", useCustomCode);
+
+  copy.addEventListener("click", async () => {
+    const id = select.value;
+    if (!id) return;
+    const link = new URL(window.location.href);
+    link.search = "";
+    link.hash = "";
+    link.searchParams.set("example", id);
+
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(link.href);
+      copied = true;
+    } catch {
+      // Keep the URL available for manual copying when the clipboard is unavailable.
+    }
+
+    if (select.value !== id) return;
+    linkStatus.textContent = copied ? "Link copied." : "Copy the link below.";
+    linkField.hidden = copied;
+    linkField.value = copied ? "" : link.href;
+    if (!copied) {
+      linkField.focus();
+      linkField.select();
+    }
   });
 
   const requested = new URLSearchParams(window.location.search).get("example");
-  if (requested !== null) {
-    const index = Number(requested);
-    if (Number.isInteger(index) && examples[index]) {
-      load(index);
-      return;
-    }
-  }
+  const initial = examplesById.get(requested) ?? (requested && examples[Number(requested)]);
+  if (initial) selectExample(initial);
 }
 
 function wire() {

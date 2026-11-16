@@ -98,7 +98,8 @@ textarea#code {
 
 textarea#code:focus,
 input#call:focus,
-input#prediction-value:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
+input#prediction-value:focus,
+input#example-link:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
 
 .run-col { display: flex; flex-direction: column; gap: 10px; }
 .run-actions { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -106,7 +107,8 @@ input#prediction-value:focus { outline: 2px solid var(--blue-soft); border-color
 .field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
 
 input#call,
-input#prediction-value {
+input#prediction-value,
+input#example-link {
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 8px 10px;
@@ -168,6 +170,9 @@ select#example {
   width: 100%;
 }
 select#example:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
+#example-note:empty { display: none; }
+.example-share .run-actions { align-items: center; }
+#example-link { width: 100%; margin-top: 6px; }
 
 .metrics { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
 .metric {

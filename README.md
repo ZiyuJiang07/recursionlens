@@ -147,6 +147,8 @@ trace.steps[0].frames        # stack snapshot for one step
 
 The Doctor reports what it observed in the recorded calls for the selected input. If a call re-enters a subproblem that is still on the stack, check the stopping condition and recursive arguments. For functions whose results depend only on their arguments and that have no side effects, repeated work across branches is a reason to investigate memoization.
 
+To share a built-in exercise, choose it under **Examples and exercises** and click **Copy example link**. The link opens the exercise with its original code and input. After editing the code or input, select a built-in exercise again to copy its link. [Open the Grid paths exercise](https://ziyujiang07.github.io/recursionlens/?example=grid-paths)
+
 To preview a local checkout, run `python -m http.server 8000` from the repository root and open [the local playground](http://localhost:8000).
 
 ## Predict cache savings
@@ -155,7 +157,7 @@ To preview a local checkout, run `python -m http.server 8000` from the repositor
 2. Click **Predict cache savings** and enter how many function body executions you expect memoization to skip.
 3. Press **Run and check** to see your guess next to the measured savings in **Compare**. The feedback shows the number of executions in both runs and how often the memoized run reused a result.
 
-The exercise checks predictions when both runs have complete traces and matching return values. Use a function without its own cache, whose result depends only on its arguments and which has no side effects. For **Grid paths**, different orders of moving right and down can leave the same number of steps in each direction.
+The exercise checks predictions when both runs finish successfully with matching return values. Use a function without its own cache, whose result depends only on its arguments and which has no side effects. For **Grid paths**, different orders of moving right and down can leave the same number of steps in each direction.
 
 <details>
 <summary>Check the grid path result</summary>

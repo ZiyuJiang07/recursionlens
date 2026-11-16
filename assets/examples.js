@@ -1,6 +1,7 @@
 window.RL_EXAMPLES = [
   {
     "lecture": "Lecture 4 · Iteration",
+    "id": "loop-to",
     "name": "loop_to",
     "call": "loop_to(1)",
     "note": "adapted: the lecture reads num from input()",
@@ -8,6 +9,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture 6 · Functional Programming",
+    "id": "gcd",
     "name": "gcd",
     "call": "gcd(48, 18)",
     "note": "",
@@ -15,6 +17,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture 6 · Functional Programming",
+    "id": "fibonacci",
     "name": "fibonacci",
     "call": "fibonacci(6)",
     "note": "",
@@ -22,6 +25,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture 6 · Generator and Decorator",
+    "id": "fibonacci-printing",
     "name": "fibonacci (printing)",
     "call": "fibonacci(4)",
     "note": "prints the call tree while it runs",
@@ -29,6 +33,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture 6 · Generator and Decorator",
+    "id": "fibonacci-lru-cache",
     "name": "fibonacci (lru_cache)",
     "call": "fibonacci(10)",
     "note": "lru_cache computes each n once: 19 calls instead of 177 for n = 10",
@@ -36,6 +41,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture 8 · Sequence Types",
+    "id": "quicksort",
     "name": "quicksort",
     "call": "quicksort([3, 1, 2, 5, 4])",
     "note": "",
@@ -43,6 +49,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture R · Exercises",
+    "id": "merge-sorted-lists",
     "name": "merge (sorted lists)",
     "call": "merge([1, 3, 5], [2, 4, 6])",
     "note": "both inputs must already be sorted",
@@ -50,6 +57,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture R · Exercises",
+    "id": "mergesort",
     "name": "mergesort",
     "call": "mergesort([3, 1, 4, 1, 5, 9, 2, 6])",
     "note": "divide and conquer: sort each half, then merge",
@@ -57,6 +65,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture R · Exercises",
+    "id": "combination-subsets",
     "name": "combination (subsets)",
     "call": "combination(3, 2)",
     "note": "two recursive branches per level",
@@ -64,6 +73,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Lecture R · Exercises",
+    "id": "integer-sqrt",
     "name": "integer sqrt (def _)",
     "call": "_(10, 0, 10)",
     "note": "binary search on the interval [a, b)",
@@ -71,6 +81,7 @@ window.RL_EXAMPLES = [
   },
   {
     "lecture": "Practice",
+    "id": "grid-paths",
     "name": "Grid paths",
     "call": "paths(3, 3)",
     "note": "Move only right or down. Different move orders can reach the same remaining steps.",
