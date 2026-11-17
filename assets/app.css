@@ -203,7 +203,15 @@ select#growth-example:focus { outline: 2px solid var(--blue-soft); border-color:
 .growth-header h2 { font-size: 18px; margin: 0; }
 .growth-header .field { min-width: min(170px, 100%); }
 .growth-summary { font-size: 13px; color: var(--text); margin: 8px 0 12px; }
-.growth-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
+.growth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 6px;
+}
+.growth-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); }
 .growth-legend span { display: inline-flex; align-items: center; gap: 7px; }
 .growth-legend span::before { content: ""; width: 22px; border-top: 3px solid var(--coral); }
 .growth-legend .growth-cached::before { border-top: 3px dashed var(--blue); }
@@ -365,6 +373,7 @@ g.call-selected > rect { fill: var(--blue-soft); stroke-width: 3; }
   .view-layout { flex-direction: column; align-items: stretch; }
   .trace-inspector { width: 100%; order: -1; margin-top: 0; }
 }
+#download-json { margin-bottom: 8px; }
 .jsonout {
   margin: 0;
   max-height: 560px;

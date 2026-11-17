@@ -178,6 +178,8 @@ Fibonacci 的输入从 1 到 12。运行 `fibonacci(12)` 时，开启记忆化�
 
 ## 导出报告
 
+在 **Growth** 点 **Download CSV**，可把各组输入和实测次数保存到表格中。在 **JSON** 点 **Download JSON**，可保存当前运行的追踪报告。
+
 ```python
 naive.export_html("fib-tree.html")
 naive.export_html("fib-dag.html", mode="dag")

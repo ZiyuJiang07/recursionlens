@@ -7811,6 +7811,7 @@ a.anchor-link {
 <li>点 <strong>Growth</strong>，选择 <strong>fibonacci</strong> 或 <strong>Grid paths</strong>，对比多组输入在开启记忆化前后的函数体执行次数。展开 <strong>Exact counts</strong> 可查看每组输入的实测值。运行 <code>paths(6, 6)</code> 时，执行次数从 <strong>1,847 次降到 48 次</strong>。<a href="https://github.com/ZiyuJiang07/recursionlens/blob/main/README.zh-CN.md#对比输入变大时的执行次数">增长曲线操作指南</a></li>
 <li>在 <strong>Examples and exercises</strong> 里选 <strong>Debug a base case</strong>。打开 <strong>Recursion Doctor</strong>，点 <strong>Show call</strong> 沿调用路径找到报错的 <code>reciprocal_sum(n=0)</code>。把递归出口改成返回 <code>0</code>，再运行一次验证。<a href="https://ziyujiang07.github.io/recursionlens/?example=debug-base-case">打开排错练习</a></li>
 <li>在 <strong>Step through</strong> 点 <strong>Play</strong>，就能看调用树随执行逐步展开。点 <strong>Pause</strong> 可查看当前栈帧，也可以拖动进度条跳到指定步骤。</li>
+<li>在 <strong>Growth</strong> 点 <strong>Download CSV</strong>，可把各组输入和实测次数保存到表格中。在 <strong>JSON</strong> 点 <strong>Download JSON</strong>，可保存当前运行的追踪报告。</li>
 </ul>
 <div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>recursionlens
 </pre></div>

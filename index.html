@@ -134,9 +134,12 @@
       <div id="growth-error" class="status error" role="status" hidden></div>
       <div id="growth-output" hidden>
         <p id="growth-summary" class="growth-summary" role="status"></p>
-        <div class="growth-legend">
-          <span>Without memoization</span>
-          <span class="growth-cached">With memoization</span>
+        <div class="growth-actions">
+          <div class="growth-legend">
+            <span>Without memoization</span>
+            <span class="growth-cached">With memoization</span>
+          </div>
+          <button type="button" id="download-growth" class="trace-action">Download CSV</button>
         </div>
         <canvas id="growth-chart" role="img" aria-label="Function executions with and without memoization by input size" aria-describedby="growth-summary"></canvas>
         <details class="growth-details">
@@ -153,7 +156,10 @@
   </section>
   <section id="panel-doctor" class="panel" role="tabpanel" aria-labelledby="tab-doctor" hidden></section>
   <section id="panel-json" class="panel" role="tabpanel" aria-labelledby="tab-json" hidden>
-    <div class="card inner"><pre id="jsonout" class="jsonout"></pre></div>
+    <div class="card inner">
+      <button type="button" id="download-json" class="trace-action" disabled>Download JSON</button>
+      <pre id="jsonout" class="jsonout"></pre>
+    </div>
   </section>
   </div>
   <aside id="trace-inspector" class="card trace-inspector" aria-labelledby="inspector-heading" hidden>

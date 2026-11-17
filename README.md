@@ -178,6 +178,8 @@ Fibonacci uses inputs 1 through 12. On `fibonacci(12)`, memoization reduces body
 
 ## Export a report
 
+In **Growth**, click **Download CSV** to save the input sizes and measured counts for a spreadsheet. In **JSON**, click **Download JSON** to save the current trace report when it is available.
+
 ```python
 naive.export_html("fib-tree.html")
 naive.export_html("fib-dag.html", mode="dag")

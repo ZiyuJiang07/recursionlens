@@ -119,6 +119,7 @@ async function run(prediction = null) {
     el("panel-compare").innerHTML = data.views.compare;
     el("jsonout").textContent =
       data.json || "// JSON omitted for this run because it is very large.";
+    el("download-json").disabled = !data.json;
     loadTrace(data.trace);
     renderDoctor(data.doctor || []);
     el("results").hidden = false;
@@ -163,6 +164,7 @@ function clearResults() {
   state.trace = null;
   state.callId = null;
   state.subproblemId = null;
+  el("download-json").disabled = true;
   el("results").hidden = true;
 }
 
@@ -349,6 +351,24 @@ function showGrowth() {
   }
 }
 
+function downloadGrowthCsv() {
+  if (!state.growthResult) return;
+  const { id, samples } = state.growthResult;
+
+  const rows = ["input_size,input_call,bodies_without_memoization,bodies_with_memoization,bodies_saved"];
+  for (const sample of samples) {
+    const call = `"${sample.call.replaceAll('"', '""')}"`;
+    rows.push([
+      sample.size,
+      call,
+      sample.naive,
+      sample.memoized,
+      sample.naive - sample.memoized,
+    ].join(","));
+  }
+  downloadText(`recursionlens-growth-${id}.csv`, "text/csv", rows.join("\r\n") + "\r\n");
+}
+
 function wireGrowth() {
   const select = el("growth-example");
   for (const example of window.RL_EXAMPLES || []) {
@@ -358,6 +378,7 @@ function wireGrowth() {
     select.append(option);
   }
   select.addEventListener("change", showGrowth);
+  el("download-growth").addEventListener("click", downloadGrowthCsv);
   window.addEventListener("resize", () => {
     if (state.view === "growth" && state.growthResult) {
       drawGrowthChart(state.growthResult.samples);
@@ -615,6 +636,17 @@ function element(tag, text, className) {
   if (text !== undefined) node.textContent = text;
   if (className) node.className = className;
   return node;
+}
+
+function downloadText(filename, type, text) {
+  const url = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }));
+  const link = element("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function actionButton(label, action, className = "trace-action") {
@@ -951,6 +983,9 @@ function wire() {
   el("code").addEventListener("input", markResultsStale);
   el("call").addEventListener("input", markResultsStale);
   el("run").addEventListener("click", () => run());
+  el("download-json").addEventListener("click", () => {
+    downloadText("recursionlens-trace.json", "application/json", el("jsonout").textContent);
+  });
   el("predict").addEventListener("click", openPrediction);
   el("prediction-cancel").addEventListener("click", () => el("prediction-dialog").close());
   el("prediction-form").addEventListener("submit", (event) => {
