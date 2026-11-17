@@ -141,6 +141,8 @@ trace.steps[0].frames        # 某一步的栈帧快照
 
 [打开在线演示](https://ziyujiang07.github.io/recursionlens/)，等默认示例 `fib(5)` 的运行记录加载完成。
 
+在 **Step through** 点 **Play**，就能看调用树随执行逐步展开。点 **Pause** 可查看当前栈帧，也可以拖动进度条跳到指定步骤。
+
 1. 打开 **Expanded tree**（展开的调用树），点一个 `fib(2)` 节点。右侧 **Trace inspector** 会显示完整调用路径，其中一条是 `fib(5) → fib(4) → fib(3) → fib(2)`。在 **Call tree**（调用树）中，也可以点调用旁的 **Inspect**。
 2. 点 **Show in DAG**。三次 `fib(2)` 调用会合并成一个子问题节点。在 **Recorded calls** 中选一次调用，就能跳回它在调用树里的位置。
 3. 打开 **Recursion Doctor**（递归诊断），找到 `fib(2)` 重复计算的提示，点 **Show call** 查看调用树上的证据。

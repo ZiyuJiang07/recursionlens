@@ -10,6 +10,7 @@ const PACKAGE_FILES = [
 
 const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
 const LINKED_VIEWS = ["tree", "expanded", "dag"];
+const PLAYBACK_INTERVAL_MS = 350;
 const STEP_CONTROLS = ["first", "prev", "next", "last", "slider"];
 
 const state = {
@@ -20,6 +21,7 @@ const state = {
   source: "",
   steps: [],
   index: 0,
+  playbackTimer: null,
   trace: null,
   view: "step",
   callId: null,
@@ -132,6 +134,7 @@ async function run(prediction = null) {
     slider.max = Math.max(0, state.steps.length - 1);
     slider.value = 0;
     STEP_CONTROLS.forEach((id) => { el(id).disabled = !state.steps.length; });
+    el("play").disabled = state.steps.length < 2;
     renderStep(0);
 
     const truncated = data.tutor.truncated ? " · recording truncated" : "";
@@ -154,6 +157,7 @@ async function run(prediction = null) {
 }
 
 function clearResults() {
+  stopPlayback();
   state.source = "";
   state.steps = [];
   state.trace = null;
@@ -544,6 +548,34 @@ function renderFrame(step) {
     `<div class="vars">${rows}</div>`;
 }
 
+function stopPlayback() {
+  if (state.playbackTimer === null) return;
+  window.clearInterval(state.playbackTimer);
+  state.playbackTimer = null;
+  el("play").textContent = "Play";
+}
+
+function seekStep(index) {
+  stopPlayback();
+  renderStep(index);
+}
+
+function togglePlayback() {
+  if (state.playbackTimer !== null) {
+    stopPlayback();
+    return;
+  }
+
+  const last = state.steps.length - 1;
+  if (last < 1) return;
+  if (state.index === last) renderStep(0);
+  el("play").textContent = "Pause";
+  state.playbackTimer = window.setInterval(() => {
+    renderStep(state.index + 1);
+    if (state.index === last) stopPlayback();
+  }, PLAYBACK_INTERVAL_MS);
+}
+
 function renderStep(index) {
   if (!state.steps.length) {
     renderCode(null);
@@ -818,6 +850,7 @@ function renderDoctor(findings) {
 /* ---------------------------------------------------------------- ui */
 
 function switchTab(name) {
+  if (name !== "step") stopPlayback();
   state.view = name;
   document.querySelectorAll("#tabs button").forEach((button) => {
     const active = button.dataset.tab === name;
@@ -929,11 +962,12 @@ function wire() {
   el("call").addEventListener("keydown", (event) => {
     if (event.key === "Enter") run();
   });
-  el("first").addEventListener("click", () => renderStep(0));
-  el("prev").addEventListener("click", () => renderStep(state.index - 1));
-  el("next").addEventListener("click", () => renderStep(state.index + 1));
-  el("last").addEventListener("click", () => renderStep(state.steps.length - 1));
-  el("slider").addEventListener("input", (event) => renderStep(Number(event.target.value)));
+  el("first").addEventListener("click", () => seekStep(0));
+  el("prev").addEventListener("click", () => seekStep(state.index - 1));
+  el("play").addEventListener("click", togglePlayback);
+  el("next").addEventListener("click", () => seekStep(state.index + 1));
+  el("last").addEventListener("click", () => seekStep(state.steps.length - 1));
+  el("slider").addEventListener("input", (event) => seekStep(Number(event.target.value)));
 
   const tabs = [...document.querySelectorAll("#tabs button")];
   tabs.forEach((button, index) => {
@@ -957,8 +991,8 @@ function wire() {
   document.addEventListener("keydown", (event) => {
     if (state.view !== "step" || !state.steps.length) return;
     if (event.defaultPrevented || event.target.closest("textarea, input, select, dialog, #tabs")) return;
-    if (event.key === "ArrowRight") renderStep(state.index + 1);
-    if (event.key === "ArrowLeft") renderStep(state.index - 1);
+    if (event.key === "ArrowRight") seekStep(state.index + 1);
+    if (event.key === "ArrowLeft") seekStep(state.index - 1);
   });
 }
 

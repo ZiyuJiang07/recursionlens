@@ -141,6 +141,8 @@ trace.steps[0].frames        # stack snapshot for one step
 
 [Open the online playground](https://ziyujiang07.github.io/recursionlens/) and wait for the default `fib(5)` trace to load.
 
+In **Step through**, use **Play** to watch the call tree grow one step at a time. Click **Pause** to inspect the current frame, or drag the slider to jump to a step.
+
 1. Open **Expanded tree** and click a `fib(2)` node. The **Trace inspector** shows its call path. One path is `fib(5) → fib(4) → fib(3) → fib(2)`. In **Call tree**, use the **Inspect** button next to a call.
 2. Click **Show in DAG**. The three calls to `fib(2)` share one subproblem node. Select an entry under **Recorded calls** to jump back to that invocation in the tree.
 3. Open **Recursion Doctor**. Find the entry for repeated `fib(2)` work and click a **Show call** button to see the evidence in the tree.

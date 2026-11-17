@@ -226,6 +226,7 @@ select#growth-example:focus { outline: 2px solid var(--blue-soft); border-color:
 .player { display: flex; flex-direction: column; gap: 12px; }
 .player-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .player-bar button { min-width: 38px; padding: 5px 8px; }
+#play { min-width: 62px; }
 input#slider { flex: 1 1 220px; accent-color: var(--coral); }
 .stepinfo { font-size: 12px; color: var(--muted); min-width: 180px; }
 
