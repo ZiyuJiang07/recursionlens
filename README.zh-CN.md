@@ -147,6 +147,8 @@ trace.steps[0].frames        # 某一步的栈帧快照
 
 诊断基于本次输入下已记录的调用。如果某个子问题还没返回就再次被调用，可以检查停止条件和传给递归调用的参数。若函数的结果只由参数决定且没有副作用，可以用记忆化来对比跨分支的重复计算。
 
+在 **Examples and exercises** 里选 **Debug a base case**。打开 **Recursion Doctor**，点 **Show call** 沿调用路径找到报错的 `reciprocal_sum(n=0)`。把递归出口改成返回 `0`，再运行一次验证。[打开排错练习](https://ziyujiang07.github.io/recursionlens/?example=debug-base-case)
+
 要分享内置练习，在 **Examples and exercises**（示例与练习）里选中一个练习，再点 **Copy example link**。打开链接会加载练习原有的代码和输入。编辑代码或输入后，重新选择内置练习即可复制链接。[打开网格路径练习](https://ziyujiang07.github.io/recursionlens/?example=grid-paths)
 
 要预览本地版本，在仓库根目录运行 `python -m http.server 8000`，然后打开[本地演示](http://localhost:8000)。

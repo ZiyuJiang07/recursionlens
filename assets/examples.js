@@ -88,5 +88,13 @@ window.RL_EXAMPLES = [
     "growth": {"start": 0, "stop": 6, "call": "paths({n}, {n})"},
     "note": "Move only right or down. Different move orders can reach the same remaining steps.",
     "code": "def paths(right, down):\n    if right < 0 or down < 0:\n        return 0\n    if right == 0 or down == 0:\n        return 1\n    return paths(right - 1, down) + paths(right, down - 1)\n"
+  },
+  {
+    "lecture": "Practice",
+    "id": "debug-base-case",
+    "name": "Debug a base case",
+    "call": "reciprocal_sum(3)",
+    "note": "Use Recursion Doctor to find the call that reaches division by zero.",
+    "code": "def reciprocal_sum(n):\n    if n == 0:\n        return 1 / n\n    return 1 / n + reciprocal_sum(n - 1)\n"
   }
 ];

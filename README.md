@@ -147,6 +147,8 @@ trace.steps[0].frames        # stack snapshot for one step
 
 The Doctor reports what it observed in the recorded calls for the selected input. If a call re-enters a subproblem that is still on the stack, check the stopping condition and recursive arguments. For functions whose results depend only on their arguments and that have no side effects, repeated work across branches is a reason to investigate memoization.
 
+Try **Debug a base case** under **Examples and exercises**. In **Recursion Doctor**, click **Show call** to follow the error to `reciprocal_sum(n=0)`. Change the base case to return `0` and rerun to check the fix. [Open the debugging exercise](https://ziyujiang07.github.io/recursionlens/?example=debug-base-case)
+
 To share a built-in exercise, choose it under **Examples and exercises** and click **Copy example link**. The link opens the exercise with its original code and input. After editing the code or input, select a built-in exercise again to copy its link. [Open the Grid paths exercise](https://ziyujiang07.github.io/recursionlens/?example=grid-paths)
 
 To preview a local checkout, run `python -m http.server 8000` from the repository root and open [the local playground](http://localhost:8000).

@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from recursionlens import trace
 from recursionlens._doctor import diagnose
 
@@ -77,3 +79,59 @@ def test_partial_trace_reports_limits_beside_supported_findings():
     assert partial["call_ids"] == []
     assert partial["subproblem_id"] is None
     assert partial["facts"] == {"recorded_calls": 8, "total_calls": 15}
+
+
+def test_failure_links_to_the_deepest_recorded_call_on_its_path():
+    @trace
+    def reciprocal(n):
+        if n == 0:
+            return 1 / n
+        return 1 / n + reciprocal(n - 1)
+
+    with pytest.raises(ZeroDivisionError):
+        reciprocal.run(3)
+
+    report = reciprocal.last_report
+    failed = diagnose(report)[0]
+    assert failed["kind"] == "failed_call"
+    assert failed["call_ids"] == [report.nodes[-1].call_id]
+    assert failed["facts"]["signature"].endswith("reciprocal(n=0)")
+    assert failed["facts"]["error"] == report.error
+
+
+def test_failure_with_a_different_error_on_the_parent_stops_at_the_parent():
+    @trace
+    def inner():
+        raise ValueError("inner error")
+
+    @trace
+    def outer():
+        try:
+            inner()
+        except ValueError as error:
+            raise RuntimeError("outer error") from error
+
+    with pytest.raises(RuntimeError):
+        outer.run()
+
+    report = outer.last_report
+    failed = diagnose(report)[0]
+    assert failed["call_ids"] == [report.roots[0].call_id]
+    assert failed["facts"]["error"] == "RuntimeError: outer error"
+
+
+def test_a_handled_error_does_not_mark_a_successful_run_as_failed():
+    @trace
+    def inner():
+        raise ValueError("recoverable")
+
+    @trace
+    def outer():
+        try:
+            inner()
+        except ValueError:
+            return 0
+
+    report = outer.run()
+    assert report.value == 0
+    assert diagnose(report) == []

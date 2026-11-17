@@ -8,12 +8,37 @@ from ._report import TraceReport
 
 
 class Finding(TypedDict):
-    kind: Literal["repeated_subproblem", "active_path_reentry", "partial_trace"]
+    kind: Literal["repeated_subproblem", "active_path_reentry", "failed_call", "partial_trace"]
     title: str
     message: str
     call_ids: list[int]
     subproblem_id: Optional[str]
     facts: dict[str, Union[str, int]]
+
+
+def _failed_call(report: TraceReport) -> Optional[Finding]:
+    error = report.error
+    if report.succeeded or error is None:
+        return None
+
+    node = report.roots[0]
+    while True:
+        child = next((child for child in reversed(node.children) if child.error == error), None)
+        if child is None:
+            break
+        node = child
+
+    message = f"{node.signature} is the deepest recorded call on this path with the error {error}."
+    if error.startswith("RecursionError:"):
+        message += " Check the stopping condition and how the arguments change."
+    return {
+        "kind": "failed_call",
+        "title": "Follow the recorded error",
+        "message": message,
+        "call_ids": [node.call_id],
+        "subproblem_id": None,
+        "facts": {"signature": node.signature, "error": error, "depth": node.depth},
+    }
 
 
 def diagnose(report: TraceReport) -> list[Finding]:
@@ -49,6 +74,10 @@ def diagnose(report: TraceReport) -> list[Finding]:
         pending.extend((child, False) for child in reversed(node.children))
 
     findings: list[Finding] = []
+    failed = _failed_call(report)
+    if failed is not None:
+        findings.append(failed)
+
     for identity, (outer, inner) in reentry_pairs.items():
         findings.append(
             {

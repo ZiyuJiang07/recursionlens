@@ -137,7 +137,10 @@ async function run(prediction = null) {
     const truncated = data.tutor.truncated ? " · recording truncated" : "";
     const error = data.run_error || data.tutor.error;
     if (error) {
-      setStatus(`${error} Recorded trace available below.`, true);
+      const hint = data.doctor?.some((finding) => finding.kind === "failed_call")
+        ? "Open Recursion Doctor to follow the recorded error."
+        : "Recorded trace available below.";
+      setStatus(`${error} ${hint}`, true);
     } else {
       setStatus(`Done · ${state.steps.length} steps · v${data.version}${truncated}`);
     }
