@@ -202,6 +202,7 @@ function renderPrediction(guess, comparison) {
   heading.id = "prediction-result-title";
   card.append(heading);
 
+  const cachedLabel = comparison?.labels?.[1] || "cached";
   if (!comparison?.same_result) {
     card.append(element("p", "A prediction needs two successful runs with matching results."));
   } else {
@@ -209,11 +210,11 @@ function renderPrediction(guess, comparison) {
     const after = comparison.right.executed_calls;
     const saved = before - after;
     if (saved < 0) {
-      card.append(element("p", "The memoized run executed more function bodies. Inspect the comparison below."));
+      card.append(element("p", `The ${cachedLabel} run executed more function bodies. Inspect the comparison below.`));
     } else {
       heading.textContent = guess === saved ? "Prediction correct" : "Prediction checked";
       card.append(element("p", `You guessed ${guess}. This run saved ${saved} function body executions (${before} → ${after}).`));
-      card.append(element("p", `The memoized run had ${comparison.right.cached_calls} cache hits. A cache hit skips the function body and any recursive calls it would make.`, "trace-note"));
+      card.append(element("p", `The ${cachedLabel} run had ${comparison.right.cached_calls} cache hits. A cache hit skips the function body and any recursive calls it would make.`, "trace-note"));
     }
   }
   el("panel-compare").prepend(card);

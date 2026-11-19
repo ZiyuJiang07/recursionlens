@@ -8204,6 +8204,10 @@ node 0:   fib(n=5) -&gt; returned
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="6.-report.compare(other,-labels=...)-%E2%80%94-ComparisonReport">6. <code>report.compare(other, labels=...)</code> — <code>ComparisonReport</code><a class="anchor-link" href="#6.-report.compare(other,-labels=...)-%E2%80%94-ComparisonReport">¶</a></h2><p>Compare two runs of the same function. The comparison also renders as HTML, with two DAGs side by side.</p>
+<p>If the function already caches results with <code>functools.lru_cache</code> (or <code>functools.cache</code>), compare it against a run that bypasses that cache instead of adding RecursionLens memoization:</p>
+<div class="highlight"><pre><span></span><span class="n">baseline</span> <span class="o">=</span> <span class="n">fib</span><span class="o">.</span><span class="n">with_options</span><span class="p">(</span><span class="n">bypass_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">baseline</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">fib</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">labels</span><span class="o">=</span><span class="p">(</span><span class="s2">"no cache"</span><span class="p">,</span> <span class="s2">"with cache"</span><span class="p">))</span>
+</pre></div>
 </div>
 </div>
 </div>
@@ -8536,7 +8540,7 @@ result: 3
 <td><code>memoize=False</code>, <code>max_calls=1000</code></td>
 </tr>
 <tr>
-<td><code>fn.with_options(memoize=, max_calls=)</code></td>
+<td><code>fn.with_options(memoize=, max_calls=, bypass_cache=)</code></td>
 <td><code>RunConfiguration</code></td>
 <td>chain <code>.run(*args)</code></td>
 </tr>

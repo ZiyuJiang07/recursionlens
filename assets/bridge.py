@@ -81,12 +81,18 @@ def _run(code: str, call: str) -> dict:
         else:
             try:
                 target, args, kwargs = _prepare_call(compiled, expression)
-                memoized = target.with_options(memoize=True).run(*args, **kwargs)
+                if getattr(target, "has_cache", False):
+                    baseline = target.with_options(bypass_cache=True).run(*args, **kwargs)
+                    comparison = baseline.compare(
+                        report, labels=("no cache", "with cache")
+                    )
+                else:
+                    memoized = target.with_options(memoize=True).run(*args, **kwargs)
+                    comparison = report.compare(memoized)
             except BaseException as exc:
                 error = html.escape(_message(exc))
                 comparison_html = f'<p class="hint">Comparison unavailable: {error}</p>'
             else:
-                comparison = report.compare(memoized)
                 comparison_html = comparison.to_html()
                 comparison_metrics = comparison.to_dict()
 
@@ -133,6 +139,7 @@ def _run(code: str, call: str) -> dict:
             "stdout": tutor.stdout[-4000:],
         },
         "version": recursionlens.__version__,
+        "uses_cache": bool(getattr(target, "has_cache", False)),
         "json": None,
     }
 
@@ -167,9 +174,20 @@ def growth_payload(code: str, call_template: str, start: int, stop: int) -> str:
                 expression = _parse_call(call)
                 # The chart needs run-wide counts, so only the root call is stored.
                 target, args, kwargs = _prepare_call(compiled, expression)
-                naive = target.with_options(max_calls=1).run(*args, **kwargs)
-                target, args, kwargs = _prepare_call(compiled, expression)
-                memoized = target.with_options(memoize=True, max_calls=1).run(*args, **kwargs)
+                if getattr(target, "has_cache", False):
+                    if hasattr(target, "cache_clear"):
+                        target.cache_clear()
+                    memoized = target.with_options(max_calls=1).run(*args, **kwargs)
+                    target, args, kwargs = _prepare_call(compiled, expression)
+                    naive = target.with_options(
+                        bypass_cache=True, max_calls=1
+                    ).run(*args, **kwargs)
+                else:
+                    naive = target.with_options(max_calls=1).run(*args, **kwargs)
+                    target, args, kwargs = _prepare_call(compiled, expression)
+                    memoized = target.with_options(memoize=True, max_calls=1).run(
+                        *args, **kwargs
+                    )
                 if not naive.compare(memoized).same_result:
                     raise ValueError(f"The runs returned different results for {call}.")
                 samples.append(

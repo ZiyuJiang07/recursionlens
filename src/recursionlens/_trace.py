@@ -327,12 +327,14 @@ class RunConfiguration:
         function_id: int,
         memoize: bool,
         max_calls: int,
+        bypass_cache: bool = False,
     ) -> None:
         self.wrapper = wrapper
         self.func = func
         self.function_id = function_id
         self.memoize = memoize
         self.max_calls = max_calls
+        self.bypass_cache = bypass_cache
 
     def run(self, *args: Any, **kwargs: Any) -> TraceReport:
         """Execute the traced function with the configured options and return a report."""
@@ -344,6 +346,7 @@ class RunConfiguration:
             kwargs,
             self.memoize,
             self.max_calls,
+            self.bypass_cache,
         )
 
 
@@ -355,6 +358,7 @@ def _run(
     kwargs: dict,
     memoize: bool,
     max_calls: int,
+    bypass_cache: bool = False,
 ) -> TraceReport:
     """Set up a fresh :class:`TraceRecorder`, invoke the function, and build a report.
 
@@ -362,10 +366,11 @@ def _run(
     inside ``func`` find it automatically. If the function raises, a report
     is still created (with ``succeeded=False``) before the exception propagates.
     """
+    target, restore = _bypass_cache(func, function_id) if bypass_cache else (func, None)
     recorder = TraceRecorder(memoize=memoize, max_calls=max_calls)
     token = _ACTIVE.set(recorder)
     try:
-        value = _invoke(function_id, func, args, kwargs, recorder)
+        value = _invoke(function_id, target, args, kwargs, recorder)
     except BaseException:
         wrapper.last_report = _make_report(func, recorder, None, succeeded=False)
         raise
@@ -375,6 +380,66 @@ def _run(
         return report
     finally:
         _ACTIVE.reset(token)
+        if restore is not None:
+            restore()
+
+
+def _bypass_cache(
+    func: Callable[..., Any], function_id: int
+) -> Tuple[Callable[..., Any], Optional[Callable[[], None]]]:
+    """Return an uncached target for ``func`` and a callback that restores it.
+
+    ``functools.lru_cache`` keeps the original function in ``__wrapped__``, but
+    recursive calls inside the body still resolve the *global* name, which points
+    at the traced cache wrapper. Rebinding that name for the duration of the run
+    makes the body call an uncached traced entry point instead, so the comparison
+    measures the algorithm without the cache.
+    """
+
+    if not callable(getattr(func, "cache_info", None)):
+        return func, None
+    uncached = getattr(func, "__wrapped__", None)
+    if uncached is None:
+        return func, None
+
+    name = getattr(uncached, "__name__", None)
+    if name is None:
+        return uncached, None
+
+    def entry(*args: Any, **kwargs: Any) -> Any:
+        active = _ACTIVE.get()
+        if active is None:
+            return uncached(*args, **kwargs)
+        return _invoke(function_id, uncached, args, kwargs, active)
+
+    # Module-level functions resolve the recursive name through their globals.
+    namespace = getattr(uncached, "__globals__", None)
+    if namespace is not None and name in namespace:
+        previous = namespace[name]
+        namespace[name] = entry
+
+        def restore_global() -> None:
+            namespace[name] = previous
+
+        return uncached, restore_global
+
+    # Nested functions resolve it through a closure cell instead.
+    code = getattr(uncached, "__code__", None)
+    closure = getattr(uncached, "__closure__", None)
+    if code is not None and closure and name in code.co_freevars:
+        cell = closure[code.co_freevars.index(name)]
+        try:
+            previous_cell = cell.cell_contents
+            cell.cell_contents = entry
+        except (AttributeError, ValueError):
+            return uncached, None
+
+        def restore_cell() -> None:
+            cell.cell_contents = previous_cell
+
+        return uncached, restore_cell
+
+    return uncached, None
 
 
 def trace(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -428,13 +493,22 @@ def trace(func: Callable[..., Any]) -> Callable[..., Any]:
         """Run the traced function and return a :class:`TraceReport`."""
         return RunConfiguration(wrapper, func, function_id, False, 1000).run(*args, **kwargs)
 
-    def with_options(*, memoize: bool = False, max_calls: int = 1000) -> RunConfiguration:
+    def with_options(
+        *,
+        memoize: bool = False,
+        max_calls: int = 1000,
+        bypass_cache: bool = False,
+    ) -> RunConfiguration:
         """Return a :class:`RunConfiguration` with the given options."""
-        return RunConfiguration(wrapper, func, function_id, memoize, max_calls)
+        return RunConfiguration(wrapper, func, function_id, memoize, max_calls, bypass_cache)
 
     wrapper.run = run
     wrapper.with_options = with_options
     wrapper.last_report = None
+    wrapper.has_cache = callable(getattr(func, "cache_info", None))
+    if wrapper.has_cache:
+        wrapper.cache_info = func.cache_info
+        wrapper.cache_clear = func.cache_clear
     wrapper.__recursionlens_original__ = func
     return wrapper
 
