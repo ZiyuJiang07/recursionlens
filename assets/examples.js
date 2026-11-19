@@ -37,7 +37,7 @@ window.RL_EXAMPLES = [
     "id": "fibonacci-lru-cache",
     "name": "fibonacci (lru_cache)",
     "call": "fibonacci(10)",
-    "note": "lru_cache computes each n once: 19 calls instead of 177 for n = 10",
+    "note": "lru_cache computes each n once: 19 calls, 8 cache hits (177 calls without it)",
     "code": "import functools\n\n@functools.lru_cache(maxsize=None)\ndef fibonacci(n):\n    \"\"\"Returns the Fibonacci number of order n.\"\"\"\n    return fibonacci(n - 1) + fibonacci(n - 2) if n > 1 else 1 if n == 1 else 0\n"
   },
   {

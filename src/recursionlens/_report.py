@@ -50,7 +50,8 @@ class TraceReport:
 
     @property
     def cached_calls(self) -> int:
-        """Number of invocations served from the memoization cache."""
+        """Invocations served from a cache: the code's own ``functools.lru_cache``
+        (or ``functools.cache``), or RecursionLens memoization when enabled."""
         if self._cached_calls is not None:
             return self._cached_calls
         return sum(node.cached for node in self.nodes)

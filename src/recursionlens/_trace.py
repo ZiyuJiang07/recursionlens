@@ -158,7 +158,9 @@ class TraceRecorder:
         cache: Memoization cache mapping cache keys to return values.
         total_calls: Total observed calls (including truncated ones).
         executed_calls: Calls where the function body actually ran.
-        cached_calls: Calls that returned from the cache without executing.
+        cached_calls: Calls served from a cache without running the body,
+            either a ``functools.lru_cache`` hit in the code or RecursionLens
+            memoization when it is enabled.
         depth: Current recursion depth.
         max_depth: Maximum depth reached during this run.
         truncated: Whether the ``max_calls`` limit was reached.
@@ -219,6 +221,21 @@ class TraceRecorder:
             self.warnings.append(message)
 
 
+def cache_hits(func: Callable[..., Any]) -> Optional[int]:
+    """Return the hit counter of a ``functools.lru_cache`` (or ``cache``) wrapper.
+
+    Returns ``None`` for plain functions, so callers can tell "not cached"
+    apart from "cached, zero hits so far".
+    """
+    info = getattr(func, "cache_info", None)
+    if not callable(info):
+        return None
+    try:
+        return int(info().hits)
+    except Exception:  # pragma: no cover - defensive for exotic wrappers
+        return None
+
+
 def _invoke(
     function_id: int,
     func: Callable[..., Any],
@@ -229,8 +246,10 @@ def _invoke(
     """Execute one invocation of ``func``, recording it in ``recorder``.
 
     This function handles three paths:
-    1. **Cache hit**: the cache key exists, so the cached value is returned
-       without executing the function body.
+    1. **Cache hit**: either the caller's ``functools.lru_cache`` served the
+       call, detected from ``cache_info().hits`` growing by exactly one while
+       no nested call happened, or RecursionLens' own memoization already has
+       the key. Either way the function body does not run.
     2. **Normal execution**: the function body runs, the result is stored in
        the cache (if memoization is enabled), and the node is marked "returned".
     3. **Exception**: the node is marked "error" and the exception is re-raised.
@@ -257,14 +276,26 @@ def _invoke(
         finally:
             recorder.depth -= 1
 
+    hits_before = cache_hits(func)
+    calls_before = recorder.total_calls
     node = recorder.add_node(identity, signature, "running")
     recorder.stack.append(node)
     try:
-        recorder.executed_calls += 1
         value = func(*args, **kwargs)
+        hits_after = cache_hits(func)
+        served_from_cache = (
+            hits_before is not None
+            and hits_after is not None
+            and hits_after - hits_before == 1
+            and recorder.total_calls == calls_before
+        )
         if node is not None:
-            node.status = "returned"
+            node.status = "cached" if served_from_cache else "returned"
             node.result = safe_repr(value)
+        if served_from_cache:
+            recorder.cached_calls += 1
+        else:
+            recorder.executed_calls += 1
 
         if recorder.memoize:
             if cache_key is None:
