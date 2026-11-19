@@ -1,3 +1,23 @@
+"""HTML/SVG rendering for RecursionLens reports.
+
+This module produces self-contained HTML fragments — no external JavaScript,
+no CDN links, no Graphviz. Every view is rendered as inline SVG or nested
+``<details>`` elements, styled by an embedded CSS string.
+
+Three view modes are supported:
+
+- **tree** — a collapsible call tree using ``<details>``/``<summary>``.
+- **dag** — a layered SVG of the compressed subproblem DAG.
+- **expanded** — a compact SVG showing every call at once.
+
+The :func:`render_comparison` function produces a side-by-side metrics table
+with both DAGs.
+
+Module boundaries: imports from :mod:`recursionlens._model`. Does not import
+from :mod:`recursionlens._trace` or :mod:`recursionlens._report` at module
+level (the report objects are passed in as duck-typed parameters).
+"""
+
 from __future__ import annotations
 
 import html
@@ -14,10 +34,12 @@ _CSS = """
 
 
 def esc(value: object) -> str:
+    """HTML-escape a value and return the escaped string."""
     return html.escape(str(value), quote=True)
 
 
 def short(value: str, limit: int = 34) -> str:
+    """Truncate ``value`` to ``limit`` characters, appending ``"..."`` if truncated."""
     return value if len(value) <= limit else value[: limit - 3] + "..."
 
 
@@ -33,6 +55,7 @@ def compact_call(signature: str, limit: int = 18) -> str:
 
 
 def metric_cards(report) -> str:
+    """Render the grid of metric cards (observed calls, executed bodies, etc.) as HTML."""
     metrics = [
         ("Observed calls", report.total_calls),
         ("Executed bodies", report.executed_calls),
@@ -52,6 +75,7 @@ def metric_cards(report) -> str:
 
 
 def report_header(report) -> str:
+    """Render the report title, subtitle (mode + outcome), metric cards, and warnings."""
     mode = "memoized" if report.memoize else "naive"
     if report.succeeded:
         outcome = f"returned <code>{esc(report.result)}</code>"
@@ -78,6 +102,7 @@ def _call_attributes(node) -> str:
 
 
 def render_tree_node(node, *, interactive: bool = False) -> str:
+    """Recursively render a single call node and its children as ``<details>`` HTML."""
     badges = ""
     if node.repeated:
         badges += '<span class="rl-badge rl-repeat">repeated</span>'
@@ -106,6 +131,7 @@ def render_tree_node(node, *, interactive: bool = False) -> str:
 
 
 def render_tree(report, *, interactive: bool = False) -> str:
+    """Render the collapsible call tree view."""
     roots = "".join(render_tree_node(root, interactive=interactive) for root in report.roots)
     return (
         '<h3 class="rl-section">Call tree</h3>'
@@ -121,7 +147,14 @@ def _mono_width(text: str, size: float = 12.0) -> float:
 
 
 def _node_style(node) -> Tuple[str, str, str, str, str]:
-    """Return fill, stroke, dot colour, label colour, and dash pattern."""
+    """Return ``(fill, stroke, dot_color, label_color, dash_pattern)`` for a node.
+
+    The style depends on the node's status:
+    - cached → green palette
+    - error → red palette
+    - repeated → coral palette with a dashed border
+    - default → neutral white
+    """
 
     if node.cached:
         return "#eaf6f0", "#9ecbb9", "#0f6e56", "#0b5c48", ""
@@ -287,6 +320,13 @@ def render_expanded_tree(report, limit: int = 120, *, interactive: bool = False)
 
 
 def dag_depths(nodes: List[DAGNode]) -> Dict[str, int]:
+    """Compute the depth of each DAG node (longest path to a leaf).
+
+    Cycles are handled defensively: if a node is already being visited (on the
+    current recursion path), its depth is treated as 0 to break the cycle.
+    This should never happen with a well-formed call tree but prevents
+    infinite recursion if the edge set is somehow cyclic.
+    """
     children = {node.identity: node.children for node in nodes}
     known = set(children)
     memo: Dict[str, int] = {}
@@ -305,6 +345,7 @@ def dag_depths(nodes: List[DAGNode]) -> Dict[str, int]:
 
 
 def render_dag(report, *, interactive: bool = False) -> str:
+    """Render the subproblem DAG as a layered SVG (at most 40 nodes)."""
     nodes = report.dag_nodes
     omitted = max(0, len(nodes) - 40)
     nodes = nodes[:40]
@@ -384,6 +425,11 @@ def render_dag(report, *, interactive: bool = False) -> str:
 
 
 def render_report(report, mode: str = "tree", *, interactive: bool = False) -> str:
+    """Render a full report (header + body) as a styled HTML fragment.
+
+    ``mode`` must be one of ``"tree"``, ``"dag"``, or ``"expanded"``.
+    ``interactive`` adds ``data-*`` attributes for the browser playground.
+    """
     views = {"tree": render_tree, "dag": render_dag, "expanded": render_expanded_tree}
     if mode not in views:
         raise ValueError("mode must be 'tree', 'dag', or 'expanded'")
@@ -392,6 +438,7 @@ def render_report(report, mode: str = "tree", *, interactive: bool = False) -> s
 
 
 def render_comparison(comparison) -> str:
+    """Render a side-by-side comparison with a metrics table and both DAGs."""
     left, right = comparison.left, comparison.right
     left_metrics, right_metrics = left.metrics(), right.metrics()
     rows = []
@@ -432,6 +479,7 @@ def render_comparison(comparison) -> str:
 
 
 def render_document(fragment: str) -> str:
+    """Wrap an HTML fragment in a complete standalone HTML document."""
     return (
         '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'

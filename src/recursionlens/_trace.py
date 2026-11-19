@@ -1,3 +1,20 @@
+"""Tracing infrastructure for RecursionLens.
+
+This module provides the :func:`trace` decorator, the :class:`TraceRecorder`
+that collects call-tree data at runtime, and :class:`RunConfiguration` for
+configuring memoized or size-limited runs.
+
+The decorator wraps a synchronous recursive function so that every invocation
+— including cache-only hits — is recorded as a :class:`~recursionlens._model.CallNode`.
+When the wrapped function is called normally, it returns the original value and
+stores a :class:`~recursionlens._report.TraceReport` on ``wrapper.last_report``.
+When ``wrapper.run(...)`` is called instead, it returns the report directly.
+
+Module boundaries: this is the only module that executes user code. It imports
+from :mod:`recursionlens._model` and :mod:`recursionlens._report` but not from
+:mod:`recursionlens._render` or :mod:`recursionlens._doctor`.
+"""
+
 from __future__ import annotations
 
 import contextvars
@@ -18,6 +35,11 @@ _MAX_REPR = 160
 
 
 def full_repr(value: Any) -> str:
+    """Return the full ``repr(value)`` without truncation.
+
+    If ``repr()`` itself raises (for example, a broken ``__repr__``),
+    a placeholder string is returned instead of propagating the exception.
+    """
     try:
         return repr(value)
     except Exception as error:
@@ -25,7 +47,11 @@ def full_repr(value: Any) -> str:
 
 
 def safe_repr(value: Any) -> str:
-    """Return a bounded representation suitable for display and JSON."""
+    """Return a bounded representation suitable for display and JSON.
+
+    The result is at most ``_MAX_REPR`` characters long. Values exceeding the
+    limit are truncated with an ellipsis.
+    """
 
     text = full_repr(value)
     if len(text) > _MAX_REPR:
@@ -34,6 +60,11 @@ def safe_repr(value: Any) -> str:
 
 
 def safe_exception(error: BaseException) -> str:
+    """Format an exception as ``"TypeName: message"`` without raising.
+
+    Some exception classes raise inside ``__str__``; this function catches
+    that and falls back to a placeholder message.
+    """
     try:
         message = str(error)
     except BaseException:
@@ -42,12 +73,22 @@ def safe_exception(error: BaseException) -> str:
 
 
 def bind_arguments(func: Callable[..., Any], args: tuple, kwargs: dict) -> inspect.BoundArguments:
+    """Bind ``args`` and ``kwargs`` to ``func``'s signature, applying defaults.
+
+    This normalizes positional/keyword/mixed calls so that the same logical
+    invocation always produces the same bound arguments, regardless of how
+    the caller passed them.
+    """
     bound = inspect.signature(func).bind(*args, **kwargs)
     bound.apply_defaults()
     return bound
 
 
 def signature_for(func: Callable[..., Any], bound: inspect.BoundArguments) -> str:
+    """Build a human-readable call signature from bound arguments.
+
+    Example: ``fib(n=5)``
+    """
     arguments = ", ".join(
         f"{name}={safe_repr(value)}" for name, value in bound.arguments.items()
     )
@@ -57,7 +98,14 @@ def signature_for(func: Callable[..., Any], bound: inspect.BoundArguments) -> st
 def identity_for(
     function_id: int, func: Callable[..., Any], bound: inspect.BoundArguments
 ) -> str:
-    """Build an untruncated internal identity independent of display formatting."""
+    """Build an untruncated internal identity independent of display formatting.
+
+    The identity includes the function ID, module, qualified name, and the
+    *type* and *value* of each argument. This ensures that two calls with
+    equal-but-different-typed arguments (e.g. ``1`` and ``1.0``) are treated
+    as distinct subproblems, which is critical for correct memoization of
+    type-sensitive pure functions.
+    """
 
     arguments = ", ".join(
         f"{name}:{type(value).__module__}.{type(value).__qualname__}={full_repr(value)}"
@@ -69,6 +117,16 @@ def identity_for(
 def cache_key_for(
     func: Callable[..., Any], bound: inspect.BoundArguments
 ) -> Optional[Tuple[Any, ...]]:
+    """Build a hashable cache key for memoization, or ``None`` if unhashable.
+
+    The key includes the function object, the parameter name, the argument
+    *type*, and the argument *value* for every bound argument. Including the
+    type prevents ``1``, ``1.0``, and ``True`` from sharing a cache entry,
+    which matters for functions whose results depend on argument type.
+
+    Returns ``None`` when any argument is unhashable (e.g. a list), so the
+    caller can emit a warning instead of crashing.
+    """
     # Python considers 1, 1.0, and True equal with equal hashes. Types are part
     # of this key so memoization cannot change a type-sensitive pure function.
     key = (
@@ -83,6 +141,30 @@ def cache_key_for(
 
 
 class TraceRecorder:
+    """Collects call-tree data during a single traced top-level invocation.
+
+    The recorder is set as the active recorder via a :class:`contextvars.ContextVar`
+    so that recursive calls inside the traced function can find it without it
+    being passed as an argument.
+
+    Attributes:
+        memoize: Whether memoization is enabled for this run.
+        max_calls: Maximum number of call nodes to store.
+        nodes: All recorded :class:`CallNode` objects in creation order.
+        roots: Top-level call nodes (those with no parent).
+        stack: Current call stack (``None`` entries appear when a node was
+            truncated and could not be stored).
+        identities: Counter of how many times each identity has been seen.
+        cache: Memoization cache mapping cache keys to return values.
+        total_calls: Total observed calls (including truncated ones).
+        executed_calls: Calls where the function body actually ran.
+        cached_calls: Calls that returned from the cache without executing.
+        depth: Current recursion depth.
+        max_depth: Maximum depth reached during this run.
+        truncated: Whether the ``max_calls`` limit was reached.
+        warnings: Human-readable warning messages for this run.
+    """
+
     def __init__(self, memoize: bool, max_calls: int) -> None:
         if max_calls < 1:
             raise ValueError("max_calls must be at least 1")
@@ -102,6 +184,12 @@ class TraceRecorder:
         self.warnings: List[str] = []
 
     def add_node(self, identity: str, signature: str, status: str) -> Optional[CallNode]:
+        """Create and store a new :class:`CallNode`, or return ``None`` if truncated.
+
+        When the ``max_calls`` limit is reached, ``self.truncated`` is set to
+        ``True`` and ``None`` is returned. The caller still increments
+        ``total_calls`` and ``depth``, so run-wide totals remain accurate.
+        """
         if len(self.nodes) >= self.max_calls:
             self.truncated = True
             return None
@@ -125,6 +213,7 @@ class TraceRecorder:
         return node
 
     def warn_unhashable(self) -> None:
+        """Add the unhashable-arguments warning, deduplicated."""
         message = "Arguments are unhashable; this run was not memoized for those calls."
         if message not in self.warnings:
             self.warnings.append(message)
@@ -137,6 +226,17 @@ def _invoke(
     kwargs: dict,
     recorder: TraceRecorder,
 ) -> Any:
+    """Execute one invocation of ``func``, recording it in ``recorder``.
+
+    This function handles three paths:
+    1. **Cache hit**: the cache key exists, so the cached value is returned
+       without executing the function body.
+    2. **Normal execution**: the function body runs, the result is stored in
+       the cache (if memoization is enabled), and the node is marked "returned".
+    3. **Exception**: the node is marked "error" and the exception is re-raised.
+
+    In all cases, ``depth`` is decremented in a ``finally`` block.
+    """
     bound = bind_arguments(func, args, kwargs)
     signature = signature_for(func, bound)
     identity = identity_for(function_id, func, bound)
@@ -183,6 +283,12 @@ def _invoke(
 
 
 class RunConfiguration:
+    """A deferred run with specific options (memoize, max_calls).
+
+    Created by :meth:`trace_wrapper.with_options`. Calling ``.run(*args)``
+    executes the traced function and returns a :class:`TraceReport`.
+    """
+
     def __init__(
         self,
         wrapper: Callable[..., Any],
@@ -198,6 +304,7 @@ class RunConfiguration:
         self.max_calls = max_calls
 
     def run(self, *args: Any, **kwargs: Any) -> TraceReport:
+        """Execute the traced function with the configured options and return a report."""
         return _run(
             self.wrapper,
             self.func,
@@ -218,6 +325,12 @@ def _run(
     memoize: bool,
     max_calls: int,
 ) -> TraceReport:
+    """Set up a fresh :class:`TraceRecorder`, invoke the function, and build a report.
+
+    The recorder is activated via a context variable so that recursive calls
+    inside ``func`` find it automatically. If the function raises, a report
+    is still created (with ``succeeded=False``) before the exception propagates.
+    """
     recorder = TraceRecorder(memoize=memoize, max_calls=max_calls)
     token = _ACTIVE.set(recorder)
     try:
@@ -234,7 +347,30 @@ def _run(
 
 
 def trace(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Instrument a synchronous recursive function while preserving its call behavior."""
+    """Instrument a synchronous recursive function while preserving its call behavior.
+
+    The returned wrapper behaves identically to ``func`` when called normally:
+    it returns the same value and raises the same exceptions. The difference is
+    that every invocation is recorded, and the wrapper gains three attributes:
+
+    - ``run(*args, **kwargs)``: call the function and return a
+      :class:`~recursionlens._report.TraceReport` instead of the raw value.
+    - ``with_options(*, memoize=False, max_calls=1000)``: return a
+      :class:`RunConfiguration` for a customized run.
+    - ``last_report``: the :class:`~recursionlens._report.TraceReport` from the
+      most recent call (whether normal or via ``run``).
+
+    Example::
+
+        @trace
+        def fib(n):
+            if n < 2:
+                return n
+            return fib(n - 1) + fib(n - 2)
+
+        assert fib(5) == 5           # normal call
+        report = fib.run(5)          # traced call → TraceReport
+    """
 
     function_id = next(_FUNCTION_IDS)
 
@@ -258,9 +394,11 @@ def trace(func: Callable[..., Any]) -> Callable[..., Any]:
             _ACTIVE.reset(token)
 
     def run(*args: Any, **kwargs: Any) -> TraceReport:
+        """Run the traced function and return a :class:`TraceReport`."""
         return RunConfiguration(wrapper, func, function_id, False, 1000).run(*args, **kwargs)
 
     def with_options(*, memoize: bool = False, max_calls: int = 1000) -> RunConfiguration:
+        """Return a :class:`RunConfiguration` with the given options."""
         return RunConfiguration(wrapper, func, function_id, memoize, max_calls)
 
     wrapper.run = run
@@ -273,6 +411,7 @@ def trace(func: Callable[..., Any]) -> Callable[..., Any]:
 def _make_report(
     func: Callable[..., Any], recorder: TraceRecorder, value: Any, succeeded: bool
 ) -> TraceReport:
+    """Build a :class:`TraceReport` from the recorder's collected data."""
     return TraceReport(
         function_name=func.__qualname__,
         value=value,

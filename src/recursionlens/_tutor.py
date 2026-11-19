@@ -13,7 +13,7 @@ import html
 import io
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 FILENAME = "<recursionlens-tutor>"
 DEFAULT_CODE = """def fib(n):

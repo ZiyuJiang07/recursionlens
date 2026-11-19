@@ -1,3 +1,15 @@
+"""Data models for RecursionLens.
+
+This module defines the core data structures used throughout the package:
+
+- :class:`CallNode` — one observed function invocation (including cache-only hits).
+- :class:`DAGNode` — all invocations with the same argument identity, merged together.
+- :func:`build_dag` — compresses a call forest into a deterministic subproblem DAG.
+
+The models are pure data classes with no dependencies on other RecursionLens
+modules, so they can be imported safely from anywhere.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -6,7 +18,16 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 @dataclass
 class CallNode:
-    """One observed function invocation, including cache-only invocations."""
+    """One observed function invocation, including cache-only invocations.
+
+    A call node records the invocation's identity, display signature, depth in
+    the call tree, status (``"running"``, ``"returned"``, ``"cached"``, or
+    ``"error"``), result or error string, whether the same subproblem was seen
+    before, and the node's children in the call tree.
+
+    The ``call_id`` is a zero-based index into the recorder's ``nodes`` list
+    and is stable within a single run.
+    """
 
     call_id: int
     identity: str
@@ -20,9 +41,11 @@ class CallNode:
 
     @property
     def cached(self) -> bool:
+        """Whether this invocation was served from the memoization cache."""
         return self.status == "cached"
 
     def to_dict(self) -> Dict[str, Any]:
+        """Serialize this node and its children to a JSON-compatible dict."""
         return {
             "call_id": self.call_id,
             "identity": self.identity,
@@ -38,7 +61,15 @@ class CallNode:
 
 @dataclass
 class DAGNode:
-    """All invocations with one internal argument identity, merged together."""
+    """All invocations with one internal argument identity, merged together.
+
+    A DAG node aggregates every call that shares the same ``identity`` string.
+    It records how many times the subproblem was called, how many of those
+    calls actually executed the function body, how many were cache hits, and
+    the first non-None result seen. The ``children`` list contains the
+    identities of distinct child subproblems, deduplicated and in first-seen
+    order.
+    """
 
     identity: str
     signature: str
@@ -49,6 +80,7 @@ class DAGNode:
     children: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
+        """Serialize this DAG node to a JSON-compatible dict."""
         return {
             "identity": self.identity,
             "signature": self.signature,
@@ -61,7 +93,20 @@ class DAGNode:
 
 
 def build_dag(nodes: Iterable[CallNode]) -> Tuple[List[DAGNode], List[Dict[str, str]]]:
-    """Compress a call forest into a deterministic subproblem DAG."""
+    """Compress a call forest into a deterministic subproblem DAG.
+
+    Given the root nodes of a call tree, this function merges all invocations
+    that share the same ``identity`` into a single :class:`DAGNode`, counts
+    executions and cache hits, and builds the set of distinct parent-child edges.
+
+    Returns a tuple of ``(dag_nodes, edges)`` where ``edges`` is a list of
+    ``{"source": identity, "target": identity}`` dicts sorted lexicographically
+    for deterministic output.
+
+    The traversal is depth-first and safe against cycles (though a well-formed
+    call tree should not contain any): a node is visited once per occurrence
+    in the tree, and edges are deduplicated via a set.
+    """
 
     merged: Dict[str, DAGNode] = {}
     edges = set()

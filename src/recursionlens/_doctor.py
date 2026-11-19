@@ -1,3 +1,26 @@
+"""Recursion Doctor: automatic pattern detection for traced runs.
+
+This module analyzes a :class:`~recursionlens._report.TraceReport` and produces
+a list of :class:`Finding` dictionaries, each describing a pattern observed in
+the recorded call tree. The findings are purely observational — the doctor does
+not execute user code or modify the trace.
+
+Supported finding kinds:
+
+- ``repeated_subproblem``: the same subproblem was executed in separate branches
+  of the call tree. This is the classic memoization opportunity signal.
+- ``active_path_reentry``: a subproblem was entered while a call to the same
+  subproblem was still on the stack. This may indicate a missing or incorrect
+  base case.
+- ``failed_call``: the run raised an exception. The finding links to the deepest
+  recorded call on the error path.
+- ``partial_trace``: the recording was truncated, so other patterns may exist
+  outside the recorded calls.
+
+Module boundaries: imports from :mod:`recursionlens._model` and
+:mod:`recursionlens._report`. Does not execute user code.
+"""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -8,6 +31,17 @@ from ._report import TraceReport
 
 
 class Finding(TypedDict):
+    """One diagnostic observation produced by :func:`diagnose`.
+
+    Fields:
+        kind: One of ``"repeated_subproblem"``, ``"active_path_reentry"``,
+            ``"failed_call"``, or ``"partial_trace"``.
+        title: Short human-readable heading.
+        message: Detailed explanation with guidance.
+        call_ids: IDs of the relevant call nodes (empty for ``partial_trace``).
+        subproblem_id: The identity string of the relevant subproblem, or ``None``.
+        facts: Structured key-value pairs for the browser playground.
+    """
     kind: Literal["repeated_subproblem", "active_path_reentry", "failed_call", "partial_trace"]
     title: str
     message: str
@@ -17,6 +51,13 @@ class Finding(TypedDict):
 
 
 def _failed_call(report: TraceReport) -> Optional[Finding]:
+    """Locate the deepest recorded call on the error path and build a finding.
+
+    Walks down the tree from the root, always following the last child whose
+    error matches the root's error, to find the deepest call that carries the
+    error. For ``RecursionError``, the message includes guidance about the
+    stopping condition.
+    """
     error = report.error
     if report.succeeded or error is None:
         return None
