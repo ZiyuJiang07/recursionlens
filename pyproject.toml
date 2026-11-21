@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "recursionlens"
-version = "0.2.0"
+version = "0.2.1"
 description = "Interactive recursion tracing, subproblem DAGs, memoization comparisons, and a Python Tutor-style step-through tutor for JupyterLab."
 readme = "README.md"
 requires-python = ">=3.9"
