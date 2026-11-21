@@ -177,7 +177,7 @@ class TraceReport:
         """
         repeated = [node for node in self.dag_nodes if node.calls > 1]
         repeated.sort(key=lambda node: (-node.calls, node.signature))
-        return repeated[: max(0, limit)
+        return repeated[: max(0, limit)]
 
     def compare(
         self,
