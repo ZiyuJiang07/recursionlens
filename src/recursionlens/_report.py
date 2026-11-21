@@ -169,6 +169,16 @@ class TraceReport:
         display(HTML(html))
         return None
 
+    def top_repeated(self, limit: int = 5) -> List[DAGNode]:
+        """Subproblems that ran more than once, most-called first.
+
+        Answers "which did we recompute most often?" without opening the DAG
+        view. Ties are ordered by signature so the result is deterministic.
+        """
+        repeated = [node for node in self.dag_nodes if node.calls > 1]
+        repeated.sort(key=lambda node: (-node.calls, node.signature))
+        return repeated[: max(0, limit)]
+
     def compare(
         self,
         other: "TraceReport",
