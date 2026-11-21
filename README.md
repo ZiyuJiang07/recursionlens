@@ -10,6 +10,16 @@ RecursionLens is a zero-runtime-dependency Python package for exploring recursiv
 
 > **JupyterLab tutorial, already executed:** [Open RecursionLens_Tutorial.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb) ([简体中文版](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)). Sixteen code cells have saved output; the final cell opens the interactive player when you run it in a live kernel. If Jupyter hides HTML/SVG from a downloaded notebook, use its **Trust** action or click **Run All Cells** once. For a zero-setup preview, download and open the [static HTML companion](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html) or its [Chinese version](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html).
 
+## Screenshots
+
+**JupyterLab — execution comparison.** `report.compare()` renders a metrics table and both DAGs inside the notebook, including how many bodies ran and how many calls were served from a cache.
+
+![RecursionLens comparison report rendered in JupyterLab](https://raw.githubusercontent.com/ZiyuJiang07/recursionlens/main/docs/img/notebook-compare.png)
+
+**Web playground — step-through player.** The call tree grows as the code runs: returned calls stay on screen in green, the current call is coral, and the current frame's locals sit underneath the tree.
+
+![RecursionLens step-through player in the browser](https://raw.githubusercontent.com/ZiyuJiang07/recursionlens/main/docs/img/web-player.png)
+
 ## Project team
 
 CS1302A Group 50:

@@ -136,7 +136,10 @@ async function run(prediction = null) {
     slider.value = 0;
     STEP_CONTROLS.forEach((id) => { el(id).disabled = !state.steps.length; });
     el("play").disabled = state.steps.length < 2;
-    renderStep(0);
+    const requestedStep = Number(
+      new URLSearchParams(window.location.search).get("step"),
+    );
+    renderStep(Number.isInteger(requestedStep) && requestedStep > 0 ? requestedStep : 0);
 
     const truncated = data.tutor.truncated ? " · recording truncated" : "";
     const error = data.run_error || data.tutor.error;

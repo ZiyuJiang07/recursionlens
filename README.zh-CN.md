@@ -10,6 +10,16 @@ RecursionLens 是一个零运行时依赖的 Python 包，用于在 JupyterLab �
 
 > **已执行的 JupyterLab 教程：** [打开 RecursionLens_Tutorial.zh-CN.ipynb](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.zh-CN.ipynb)（[English version](https://github.com/ZiyuJiang07/recursionlens/blob/main/docs/RecursionLens_Tutorial.ipynb)）。16 个代码单元已保存输出；最后一格在活内核中运行后会打开交互式播放器。如果 Jupyter 因为 notebook 未受信任而隐藏 HTML/SVG，点击 **Trust**，或执行一次 **Run All Cells**。想零配置预览，可以直接下载并打开[静态 HTML 版教程](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.zh-CN.html)或[英文版](https://github.com/ZiyuJiang07/recursionlens/raw/main/docs/RecursionLens_Tutorial.html)。
 
+## 界面截图
+
+**JupyterLab —— 执行对比。** `report.compare()` 直接在 notebook 里渲染指标表与两侧 DAG，可以看出执行了多少次函数体、有多少次调用由缓存直接返回。
+
+![在 JupyterLab 中渲染的对比报告](https://raw.githubusercontent.com/ZiyuJiang07/recursionlens/main/docs/img/notebook-compare.png)
+
+**网页版 —— 逐行播放器。** 调用树随着代码执行逐步长大：已经返回的调用留在树上变成绿色，当前调用是珊瑚色，当前帧的局部变量显示在树下方。
+
+![浏览器中的逐行播放器](https://raw.githubusercontent.com/ZiyuJiang07/recursionlens/main/docs/img/web-player.png)
+
 ## 项目团队
 
 CS1302A Group 50：
