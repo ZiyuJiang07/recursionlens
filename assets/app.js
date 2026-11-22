@@ -1,5 +1,6 @@
 const PACKAGE_FILES = [
   "__init__.py",
+  "_complexity.py",
   "_doctor.py",
   "_model.py",
   "_render.py",
@@ -309,10 +310,18 @@ function drawGrowthChart(samples) {
   }
 }
 
+function describeGrowthFit(fit) {
+  if (!fit) return "Complexity estimate unavailable for this sample.";
+  const quality = Number.isFinite(fit.r2) ? `R\u00b2 ${fit.r2.toFixed(2)}` : "";
+  const warning = fit.warning ? ` ${fit.warning}` : "";
+  return `Estimated growth: ${fit.model} (${quality} over ${fit.samples.length} sizes).${warning}`;
+}
+
 function showGrowth() {
   const id = el("growth-example").value;
   if (state.growthResult?.id === id) {
     drawGrowthChart(state.growthResult.samples);
+    el("growth-fit").textContent = describeGrowthFit(state.growthResult.fit);
     return;
   }
 
@@ -337,6 +346,7 @@ function showGrowth() {
     const last = samples[samples.length - 1];
     el("growth-summary").textContent =
       `${last.call} took ${format(last.naive)} function body executions without memoization and ${format(last.memoized)} with it.`;
+    el("growth-fit").textContent = describeGrowthFit(data.fit);
     const rows = samples.map((sample) => {
       const row = element("tr");
       const name = element("th");
@@ -347,7 +357,7 @@ function showGrowth() {
     });
     el("growth-counts").replaceChildren(...rows);
     output.hidden = false;
-    state.growthResult = { id, samples };
+    state.growthResult = { id, samples, fit: data.fit };
     drawGrowthChart(samples);
   } catch (error) {
     status.textContent = String(error.message ?? error);

@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `fit_growth()` and `GrowthFit`: dependency-free Big-O estimation from
+  measured execution counts, covering constant, logarithmic, linear,
+  linearithmic, quadratic, and exponential shapes with R² scores and warnings
+  for weak evidence.
+- Growth playground panel now displays the estimated complexity for the
+  selected built-in example.
+
+### Changed
+- `fit_growth()` reports near-constant samples as `O(1)` instead of letting a
+  sloped model win by fitting measurement noise.
 - `CONTRIBUTING.md` with development setup, coding conventions, and PR checklist.
 - `CHANGELOG.md` to track project history.
 - Module-level docstrings for `_model.py`, `_render.py`, `_report.py`,

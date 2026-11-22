@@ -186,6 +186,15 @@ Open **Growth** in the browser playground and select **fibonacci** or **Grid pat
 
 Fibonacci uses inputs 1 through 12. On `fibonacci(12)`, memoization reduces body executions from **465 to 13**. Grid paths compares square grids from 0 to 6 on each side. The count drops from **1,847 to 48** for `paths(6, 6)`. [Open the playground](https://ziyujiang07.github.io/recursionlens/)
 
+The **Estimated growth** line fits the observed counts against O(1), O(log n), O(n), O(n log n), O(n²), and O(2ⁿ), then reports the best match with an R² score. It is an observation, not a proof: short or noisy samples are labelled as tentative. The same calculation is available in Python:
+
+```python
+from recursionlens import fit_growth
+
+fit = fit_growth([1, 2, 3, 4, 5], [2, 4, 6, 8, 10])
+print(fit.model, fit.r2)  # O(n) 1.0
+```
+
 ## Export a report
 
 In **Growth**, click **Download CSV** to save the input sizes and measured counts for a spreadsheet. In **JSON**, click **Download JSON** to save the current trace report when it is available.
@@ -207,7 +216,7 @@ Version 0.2.0 targets synchronous, deterministic teaching examples such as facto
 - Identical arguments do not necessarily imply redundant work for functions with side effects or external state.
 - `max_calls` caps the stored call tree. Observed calls, executed bodies, and cache hits cover the full run. After truncation, tree and DAG metrics describe the recorded calls.
 - RecursionLens executes your function; it is **not a sandbox for untrusted code**.
-- Async functions, generators, automatic Big-O inference, and automatic code rewriting are non-goals for 0.2.0.
+- Async functions, generators, automatic Big-O inference from source code, and automatic code rewriting are non-goals for 0.2.0. `fit_growth()` fits counts you measure; it does not infer complexity from source.
 
 ## Documentation and demo
 

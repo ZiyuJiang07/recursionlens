@@ -203,6 +203,7 @@ select#growth-example:focus { outline: 2px solid var(--blue-soft); border-color:
 .growth-header h2 { font-size: 18px; margin: 0; }
 .growth-header .field { min-width: min(170px, 100%); }
 .growth-summary { font-size: 13px; color: var(--text); margin: 8px 0 12px; }
+.growth-fit { font-size: 12px; color: var(--muted); margin: -6px 0 12px; }
 .growth-actions {
   display: flex;
   flex-wrap: wrap;

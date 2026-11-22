@@ -1,5 +1,6 @@
 """RecursionLens: recursive execution analysis for JupyterLab."""
 
+from ._complexity import GrowthFit, fit_growth
 from ._model import CallNode, DAGNode
 from ._report import ComparisonReport, TraceReport
 from ._trace import trace
@@ -11,9 +12,11 @@ __all__ = [
     "CallNode",
     "ComparisonReport",
     "DAGNode",
+    "GrowthFit",
     "TraceReport",
     "TutorStep",
     "TutorTrace",
+    "fit_growth",
     "record_tutor",
     "trace",
     "tutor",
