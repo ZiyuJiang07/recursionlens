@@ -30,6 +30,7 @@ All 63+ tests should pass in under a second.
 recursionlens/
 ├── src/recursionlens/
 │   ├── __init__.py       Public API exports
+│   ├── _complexity.py    Growth-model fitting and Big-O estimates
 │   ├── _trace.py         Decorator, recorder, and run configuration
 │   ├── _model.py         CallNode, DAGNode, and build_dag()
 │   ├── _render.py        HTML/SVG rendering for all views
@@ -70,6 +71,8 @@ recursionlens/
   `CallNode` but does not execute user code.
 - `_tutor.py` owns the stepper. It uses `sys.settrace` and is independent of
   the `trace` decorator.
+- `_complexity.py` fits growth models from measured counts. It uses only the
+  standard library and imports no other RecursionLens modules.
 
 ### Testing
 

@@ -7,7 +7,7 @@ import io
 import json
 
 import recursionlens
-from recursionlens import record_tutor, trace
+from recursionlens import fit_growth, record_tutor, trace
 from recursionlens._doctor import diagnose
 from recursionlens._render import render_report
 
@@ -198,6 +198,15 @@ def growth_payload(code: str, call_template: str, start: int, stop: int) -> str:
                         "memoized": memoized.executed_calls,
                     }
                 )
-        return json.dumps({"samples": samples}, ensure_ascii=False)
+        fit = None
+        if len(samples) >= 3:
+            try:
+                fit = fit_growth(
+                    [sample["size"] for sample in samples],
+                    [sample["naive"] for sample in samples],
+                ).to_dict()
+            except ValueError:
+                fit = None
+        return json.dumps({"samples": samples, "fit": fit}, ensure_ascii=False)
     except BaseException as exc:  # noqa: BLE001 - show the failure in the playground
         return json.dumps({"error": _message(exc)}, ensure_ascii=False)
