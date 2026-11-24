@@ -182,9 +182,9 @@ The exercise checks predictions when both runs finish successfully with matching
 
 ## Compare growth across input sizes
 
-Growth measures the Python code currently in the editor. Enter a valid input call and press **Run**, then open **Growth**. The call template starts from your input call by replacing its first integer argument with `{n}`. You can edit it to control what input size means for your function.
+Growth measures the Python code currently in the editor. Click **Growth** beside **Run** to open its controls. Set a call template and input range for your function. When the main input call matches a function in your code, Growth suggests a template by replacing its first integer argument with `{n}`.
 
-For example, paste this function and run `countdown(5)`:
+For example, paste this function, then click **Growth**:
 
 ```python
 def countdown(n):

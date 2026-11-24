@@ -150,6 +150,7 @@ class TraceRecorder:
     Attributes:
         memoize: Whether memoization is enabled for this run.
         max_calls: Maximum number of call nodes to store.
+        bypass_cache: Whether traced calls should execute their uncached bodies.
         nodes: All recorded :class:`CallNode` objects in creation order.
         roots: Top-level call nodes (those with no parent).
         stack: Current call stack (``None`` entries appear when a node was
@@ -167,11 +168,12 @@ class TraceRecorder:
         warnings: Human-readable warning messages for this run.
     """
 
-    def __init__(self, memoize: bool, max_calls: int) -> None:
+    def __init__(self, memoize: bool, max_calls: int, bypass_cache: bool = False) -> None:
         if max_calls < 1:
             raise ValueError("max_calls must be at least 1")
         self.memoize = memoize
         self.max_calls = max_calls
+        self.bypass_cache = bypass_cache
         self.nodes: List[CallNode] = []
         self.roots: List[CallNode] = []
         self.stack: List[Optional[CallNode]] = []
@@ -256,6 +258,8 @@ def _invoke(
 
     In all cases, ``depth`` is decremented in a ``finally`` block.
     """
+    if recorder.bypass_cache and callable(getattr(func, "cache_info", None)):
+        func = getattr(func, "__wrapped__", func)
     bound = bind_arguments(func, args, kwargs)
     signature = signature_for(func, bound)
     identity = identity_for(function_id, func, bound)
@@ -367,7 +371,7 @@ def _run(
     is still created (with ``succeeded=False``) before the exception propagates.
     """
     target, restore = _bypass_cache(func, function_id) if bypass_cache else (func, None)
-    recorder = TraceRecorder(memoize=memoize, max_calls=max_calls)
+    recorder = TraceRecorder(memoize=memoize, max_calls=max_calls, bypass_cache=bypass_cache)
     token = _ACTIVE.set(recorder)
     try:
         value = _invoke(function_id, target, args, kwargs, recorder)

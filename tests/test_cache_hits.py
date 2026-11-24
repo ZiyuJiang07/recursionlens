@@ -123,3 +123,24 @@ def test_plain_functions_report_no_cache():
         return n if n < 2 else fib(n - 1) + fib(n - 2)
 
     assert fib.has_cache is False
+
+
+def test_bypass_cache_includes_cached_helpers_and_preserves_their_cache():
+    @trace
+    @functools.lru_cache(maxsize=None)
+    def fib(n):
+        return n if n < 2 else fib(n - 1) + fib(n - 2)
+
+    @trace
+    def run(n):
+        return fib(n)
+
+    fib.run(5)
+    previous_cache = fib.cache_info()
+    baseline = run.with_options(bypass_cache=True).run(5)
+
+    assert baseline.value == 5
+    assert baseline.executed_calls == 16
+    assert baseline.cached_calls == 0
+    assert fib.cache_info() == previous_cache
+    assert run.run(5).cached_calls == 1

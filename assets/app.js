@@ -20,6 +20,7 @@ const state = {
   growthPayload: null,
   suggestGrowthCall: null,
   growthInputCall: null,
+  growthSuggestion: "",
   growthResult: null,
   source: "",
   steps: [],
@@ -126,6 +127,8 @@ async function run(prediction = null) {
     el("download-json").disabled = !data.json;
     loadTrace(data.trace);
     renderDoctor(data.doctor || []);
+    document.querySelectorAll("#tabs button").forEach((tab) => { tab.disabled = false; });
+    el("metrics").hidden = false;
     el("results").hidden = false;
     if (prediction === null) {
       switchTab(state.view);
@@ -161,6 +164,7 @@ async function run(prediction = null) {
   } finally {
     button.disabled = false;
     el("predict").disabled = false;
+    el("growth-open").disabled = false;
   }
 }
 
@@ -173,13 +177,31 @@ function clearResults() {
   state.callId = null;
   state.subproblemId = null;
   el("download-json").disabled = true;
-  el("results").hidden = true;
+  el("jsonout").textContent = "";
+  el("metrics").replaceChildren();
+  el("metrics").hidden = true;
+  for (const view of ["tree", "expanded", "dag", "compare", "doctor"]) {
+    el(`panel-${view}`).replaceChildren();
+  }
+  STEP_CONTROLS.forEach((id) => { el(id).disabled = true; });
+  el("play").disabled = true;
+  renderStep(0);
+  el("stepout").textContent = "";
+  el("stepout").hidden = true;
+  document.querySelectorAll("#tabs button").forEach((tab) => {
+    tab.disabled = tab.dataset.tab !== "growth";
+  });
+  el("results").hidden = state.view !== "growth";
+  renderSelection();
 }
 
 function markResultsStale() {
   if (el("results").hidden) return;
   clearResults();
-  setStatus("Code or call changed. Run again to see the new trace.");
+  if (state.view === "growth") showGrowth();
+  setStatus(state.view === "growth"
+    ? "Code or call changed. Measure growth again."
+    : "Code or call changed. Run again to see the new trace.");
 }
 
 const METRIC_LABELS = [
@@ -323,10 +345,13 @@ function describeGrowthFit(fit) {
 
 function showGrowth() {
   const call = el("call").value.trim();
-  if (state.growthInputCall !== call) {
-    el("growth-call").value = state.suggestGrowthCall?.(call) || "";
-    state.growthInputCall = call;
+  const field = el("growth-call");
+  if (state.growthInputCall !== call || field.value === state.growthSuggestion) {
+    const suggestion = state.suggestGrowthCall?.(call, el("code").value) || "";
+    field.value = suggestion;
+    state.growthSuggestion = suggestion;
   }
+  state.growthInputCall = call;
   if (state.growthResult) {
     drawGrowthChart(state.growthResult.samples);
   }
@@ -350,6 +375,7 @@ function measureGrowth(event) {
   }
 
   button.disabled = true;
+  setStatus("Measuring growth…");
   try {
     const template = el("growth-call").value.trim();
     const start = el("growth-start").valueAsNumber;
@@ -378,9 +404,11 @@ function measureGrowth(event) {
     el("growth-counts").replaceChildren(...rows);
     el("growth-output").hidden = false;
     drawGrowthChart(samples);
+    setStatus(`Done · measured ${samples.length} growth input sizes`);
   } catch (error) {
     status.textContent = String(error.message ?? error);
     status.hidden = false;
+    setStatus("Growth measurement failed. See the message below.", true);
   } finally {
     button.disabled = false;
   }
@@ -911,6 +939,7 @@ function renderDoctor(findings) {
 /* ---------------------------------------------------------------- ui */
 
 function switchTab(name) {
+  if (el(`tab-${name}`).disabled) return;
   if (name !== "step") stopPlayback();
   state.view = name;
   document.querySelectorAll("#tabs button").forEach((button) => {
@@ -1012,6 +1041,11 @@ function wire() {
   el("code").addEventListener("input", markResultsStale);
   el("call").addEventListener("input", markResultsStale);
   el("run").addEventListener("click", () => run());
+  el("growth-open").addEventListener("click", () => {
+    el("results").hidden = false;
+    switchTab("growth");
+    setStatus("Growth ready. Set a call template and input range.");
+  });
   el("download-json").addEventListener("click", () => {
     downloadText("recursionlens-trace.json", "application/json", el("jsonout").textContent);
   });
@@ -1034,18 +1068,20 @@ function wire() {
   el("slider").addEventListener("input", (event) => seekStep(Number(event.target.value)));
 
   const tabs = [...document.querySelectorAll("#tabs button")];
-  tabs.forEach((button, index) => {
+  tabs.forEach((button) => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
     button.addEventListener("keydown", (event) => {
+      const enabled = tabs.filter((tab) => !tab.disabled);
+      const index = enabled.indexOf(button);
       let next;
-      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-      else if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+      if (event.key === "ArrowRight") next = (index + 1) % enabled.length;
+      else if (event.key === "ArrowLeft") next = (index + enabled.length - 1) % enabled.length;
       else if (event.key === "Home") next = 0;
-      else if (event.key === "End") next = tabs.length - 1;
+      else if (event.key === "End") next = enabled.length - 1;
       else return;
       event.preventDefault();
-      switchTab(tabs[next].dataset.tab);
-      tabs[next].focus();
+      switchTab(enabled[next].dataset.tab);
+      enabled[next].focus();
     });
   });
 

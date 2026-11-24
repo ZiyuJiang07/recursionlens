@@ -145,6 +145,21 @@ def test_growth_suggests_an_input_template_from_the_current_call(call, template)
     assert suggest_growth_call(call) == template
 
 
+def test_growth_does_not_suggest_the_previous_functions_call_for_new_code():
+    code = "def countdown(n):\n    return n\n"
+
+    assert suggest_growth_call("fib(5)", code) == ""
+    assert suggest_growth_call("countdown(5)", code) == "countdown({n})"
+    assert suggest_growth_call("countdown(5)", "def countdown(") == ""
+
+
+def test_growth_uses_the_named_function_when_the_code_has_multiple_functions():
+    code = "def first(n):\n    return n\n\ndef second(n):\n    return 2*n\n"
+
+    assert suggest_growth_call("second(5)", code) == "second({n})"
+    assert suggest_growth_call("unknown(5)", code) == ""
+
+
 @pytest.mark.parametrize(
     ("template", "start", "stop", "step", "message"),
     [
@@ -177,3 +192,40 @@ def test_growth_limit_stops_a_nonterminating_input_and_restores_tracing(monkeypa
     assert "measurement limit reached" in payload["error"]
     assert payload["failed_call"] == "stuck(1)"
     assert sys.gettrace() is previous
+
+
+@pytest.mark.parametrize("template", ["descend(**{'n': {n}})", "descend(*({n},))"])
+def test_growth_expands_user_call_arguments_instead_of_using_defaults(template):
+    code = """def descend(n=0):
+    return 0 if n == 0 else 1 + descend(n - 1)
+"""
+    payload = json.loads(growth_payload(code, template, 1, 5))
+
+    assert [sample["naive"] for sample in payload["samples"]] == [2, 3, 4, 5, 6]
+    assert payload["fit"]["model"] == "O(n)"
+
+
+def test_growth_reports_duplicate_expanded_keywords():
+    code = "def identity(n=0):\n    return n\n"
+    payload = json.loads(growth_payload(code, "identity(n={n}, **{'n': 1})", 1, 3))
+
+    assert "TypeError" in payload["error"]
+    assert "multiple values for keyword argument 'n'" in payload["error"]
+    assert payload["failed_call"] == "identity(n=1, **{'n': 1})"
+
+
+def test_growth_bypasses_a_cached_helper_for_the_uncached_curve():
+    code = """from functools import lru_cache
+
+@lru_cache(None)
+def fib(n):
+    return n if n < 2 else fib(n - 1) + fib(n - 2)
+
+def run(n):
+    return fib(n)
+"""
+    payload = json.loads(growth_payload(code, "run({n})", 1, 8))
+
+    assert payload["samples"][-1] == {"size": 8, "call": "run(8)", "naive": 68, "memoized": 10}
+    assert payload["fit"]["model"] == "O(2^n)"
+    assert payload["memoized_fit"]["model"] == "O(n)"

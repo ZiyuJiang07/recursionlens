@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Growth has an editor-side entry and stays available after code edits or a
+  failed main input call. Stale trace views stay disabled until a new trace
+  completes successfully.
+- Growth expands positional and keyword arguments using Python call semantics
+  and bypasses cached helper functions when measuring the uncached baseline.
 - Growth now measures the current editor code using an editable input call
   template, range, and step. It refreshes results when the source or range
   changes and fits both execution curves independently.

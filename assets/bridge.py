@@ -56,8 +56,23 @@ def _prepare_call(code, expression):
     def evaluate(node):
         return eval(compile(ast.Expression(node), "<web>", "eval"), namespace)
 
-    args = [evaluate(node) for node in expression.args]
-    kwargs = {kw.arg: evaluate(kw.value) for kw in expression.keywords if kw.arg}
+    args = []
+    for argument in expression.args:
+        if isinstance(argument, ast.Starred):
+            args.extend(evaluate(argument.value))
+        else:
+            args.append(evaluate(argument))
+    kwargs = {}
+    for keyword in expression.keywords:
+        values = (
+            dict(**evaluate(keyword.value))
+            if keyword.arg is None
+            else {keyword.arg: evaluate(keyword.value)}
+        )
+        for key, value in values.items():
+            if key in kwargs:
+                raise TypeError(f"{name}() got multiple values for keyword argument '{key}'")
+            kwargs[key] = value
 
     target = namespace.get(name)
     if target is None or not hasattr(target, "run"):
@@ -166,11 +181,18 @@ def run_payload(code: str, call: str) -> str:
         return json.dumps({"error": _message(exc)}, ensure_ascii=False)
 
 
-def suggest_growth_call(call: str) -> str:
-    """Replace the first integer argument in a call with the size placeholder."""
+def suggest_growth_call(call: str, code: str = "") -> str:
+    """Suggest a template when the input call names a function in the supplied code."""
     call = (call or "").strip()
     try:
         expression = _parse_call(call)
+        if code:
+            definitions = ast.parse(code).body
+            if not any(
+                isinstance(node, ast.FunctionDef) and node.name == expression.func.id
+                for node in definitions
+            ):
+                return ""
     except (SyntaxError, ValueError):
         return ""
 
@@ -232,20 +254,12 @@ def growth_payload(code: str, call_template: str, start: int, stop: int, step: i
                 expression = _parse_call(call)
                 # The chart needs run-wide counts, so only the root call is stored.
                 target, args, kwargs = _prepare_call(compiled, expression)
-                if getattr(target, "has_cache", False):
-                    if hasattr(target, "cache_clear"):
-                        target.cache_clear()
-                    memoized = target.with_options(max_calls=1).run(*args, **kwargs)
-                    target, args, kwargs = _prepare_call(compiled, expression)
-                    naive = target.with_options(
-                        bypass_cache=True, max_calls=1
-                    ).run(*args, **kwargs)
-                else:
-                    naive = target.with_options(max_calls=1).run(*args, **kwargs)
-                    target, args, kwargs = _prepare_call(compiled, expression)
-                    memoized = target.with_options(memoize=True, max_calls=1).run(
-                        *args, **kwargs
-                    )
+                naive = target.with_options(bypass_cache=True, max_calls=1).run(*args, **kwargs)
+                target, args, kwargs = _prepare_call(compiled, expression)
+                has_cache = getattr(target, "has_cache", False)
+                if has_cache:
+                    target.cache_clear()
+                memoized = target.with_options(memoize=not has_cache, max_calls=1).run(*args, **kwargs)
                 if not naive.compare(memoized).same_result:
                     raise ValueError(f"The runs returned different results for {call}.")
                 samples.append(
