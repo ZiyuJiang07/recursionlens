@@ -99,7 +99,8 @@ textarea#code {
 textarea#code:focus,
 input#call:focus,
 input#prediction-value:focus,
-input#example-link:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
+input#example-link:focus,
+.growth-form input:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
 
 .run-col { display: flex; flex-direction: column; gap: 10px; }
 .run-actions { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -108,7 +109,8 @@ input#example-link:focus { outline: 2px solid var(--blue-soft); border-color: va
 
 input#call,
 input#prediction-value,
-input#example-link {
+input#example-link,
+.growth-form input {
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 8px 10px;
@@ -159,8 +161,7 @@ button.primary:hover { background: #14508c; }
 
 .hint { font-size: 11px; color: var(--muted); min-height: 14px; }
 
-select#example,
-select#growth-example {
+select#example {
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 8px 10px;
@@ -170,8 +171,7 @@ select#growth-example {
   color: var(--text);
   width: 100%;
 }
-select#example:focus,
-select#growth-example:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
+select#example:focus { outline: 2px solid var(--blue-soft); border-color: var(--blue); }
 #example-note:empty { display: none; }
 .example-share .run-actions { align-items: center; }
 #example-link { width: 100%; margin-top: 6px; }
@@ -201,7 +201,18 @@ select#growth-example:focus { outline: 2px solid var(--blue-soft); border-color:
 .growth-card { padding: 16px; }
 .growth-header { display: flex; align-items: center; justify-content: space-between; gap: 8px 18px; flex-wrap: wrap; }
 .growth-header h2 { font-size: 18px; margin: 0; }
-.growth-header .field { min-width: min(170px, 100%); }
+.growth-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) repeat(3, 76px) auto;
+  align-items: end;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.growth-form input { width: 100%; min-width: 0; }
+@media (max-width: 760px) {
+  .growth-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .growth-form .field:first-child, #growth-run { grid-column: 1 / -1; }
+}
 .growth-summary { font-size: 13px; color: var(--text); margin: 8px 0 12px; }
 .growth-fit { font-size: 12px; color: var(--muted); margin: -6px 0 12px; }
 .growth-actions {

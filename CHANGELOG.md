@@ -7,13 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Growth now measures the current editor code using an editable input call
+  template, range, and step. It refreshes results when the source or range
+  changes and fits both execution curves independently.
+
 ### Added
 - `fit_growth()` and `GrowthFit`: dependency-free Big-O estimation from
   measured execution counts, covering constant, logarithmic, linear,
   linearithmic, quadratic, and exponential shapes with R² scores and warnings
   for weak evidence.
 - Growth playground panel now displays the estimated complexity for the
-  selected built-in example.
+  code being measured.
 
 ### Changed
 - `fit_growth()` reports near-constant samples as `O(1)` instead of letting a

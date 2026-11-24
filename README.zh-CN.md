@@ -182,11 +182,22 @@ trace.steps[0].frames        # 某一步的栈帧快照
 
 ## 对比输入变大时的执行次数
 
-在网页演示中打开 **Growth**，选择 **fibonacci** 或 **Grid paths**。两条曲线显示开启记忆化前后的实测函数体执行次数。每个输入大小都各自从头运行，点 **Exact counts** 可查看每组输入和对应次数。
+Growth 会测量编辑器里当前的 Python 代码。填好有效的 **Input call**，点 **Run**，再打开 **Growth**。网页会把输入调用中的第一个整数参数替换成 `{n}`，作为调用模板。你可以编辑模板，指定自己的函数里哪个输入随规模变化。
 
-Fibonacci 的输入从 1 到 12。运行 `fibonacci(12)` 时，开启记忆化后，执行次数从 **465 次降到 13 次**。网格路径比较两边等长的网格，边长从 0 到 6。运行 `paths(6, 6)` 时，执行次数从 **1,847 次降到 48 次**。[打开网页演示](https://ziyujiang07.github.io/recursionlens/)
+例如，粘贴下面的函数并运行 `countdown(5)`：
 
-**Estimated growth** 一行会把实测次数与 O(1)、O(log n)、O(n)、O(n log n)、O(n²) 和 O(2ⁿ) 逐一拟合，给出最匹配的复杂度及 R² 分数。这只是观察结果，不是证明：样本太少或噪声太大时会标注为「仅供参考」。同样的计算也可以直接在 Python 里调用：
+```python
+def countdown(n):
+    return 0 if n == 0 else 1 + countdown(n - 1)
+```
+
+在 **Growth** 中使用 `countdown({n})`，把 **From** 设为 1，**To** 设为 8，**Step** 设为 1，再点 **Measure current code**。表格会显示 2 到 9 次函数体执行，拟合形状为线性增长。每个输入大小下的两次对比运行都会从新状态开始。
+
+多个输入可以用 `paths({n}, {n})` 同时改变两个维度。接收列表的函数可以用 `sum_list(list(range({n})))` 随规模改变列表长度。**Exact counts** 表格和 **Download CSV** 导出的是你当前代码的实测数据。
+
+两行拟合结果分别分析开启记忆化前后的函数体执行次数，候选形状为 O(1)、O(log n)、O(n)、O(n log n)、O(n²) 和 O(2ⁿ)。它们描述所选范围内的函数体执行次数。循环内的工作量可能增加，而函数体执行次数保持不变。每次最多测量 30 个输入大小，并在 200,000 个追踪代码步骤或五秒后停止。
+
+同样的拟合计算也可以直接在 Python 里调用：
 
 ```python
 from recursionlens import fit_growth

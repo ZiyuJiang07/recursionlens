@@ -182,11 +182,22 @@ The exercise checks predictions when both runs finish successfully with matching
 
 ## Compare growth across input sizes
 
-Open **Growth** in the browser playground and select **fibonacci** or **Grid paths**. The two curves show measured function body executions with and without memoization. Each input size starts a fresh run for each curve. The **Exact counts** table lists the calls behind the points.
+Growth measures the Python code currently in the editor. Enter a valid input call and press **Run**, then open **Growth**. The call template starts from your input call by replacing its first integer argument with `{n}`. You can edit it to control what input size means for your function.
 
-Fibonacci uses inputs 1 through 12. On `fibonacci(12)`, memoization reduces body executions from **465 to 13**. Grid paths compares square grids from 0 to 6 on each side. The count drops from **1,847 to 48** for `paths(6, 6)`. [Open the playground](https://ziyujiang07.github.io/recursionlens/)
+For example, paste this function and run `countdown(5)`:
 
-The **Estimated growth** line fits the observed counts against O(1), O(log n), O(n), O(n log n), O(n²), and O(2ⁿ), then reports the best match with an R² score. It is an observation, not a proof: short or noisy samples are labelled as tentative. The same calculation is available in Python:
+```python
+def countdown(n):
+    return 0 if n == 0 else 1 + countdown(n - 1)
+```
+
+In **Growth**, use `countdown({n})`, **From** 1, **To** 8, and **Step** 1. Click **Measure current code**. The table will show 2 through 9 function executions, and the fitted shape is linear. Both runs start from fresh state at every input size.
+
+For multiple inputs, `paths({n}, {n})` varies both dimensions. For a function that accepts a list, a template such as `sum_list(list(range({n})))` varies the list length. The **Exact counts** table and **Download CSV** use the results from your code.
+
+The two estimate lines fit executions with and without memoization separately against O(1), O(log n), O(n), O(n log n), O(n²), and O(2ⁿ). They describe the measured function body executions over the chosen range. Work inside loops can grow while function body counts stay constant. Each measurement accepts up to 30 input sizes and stops after 200,000 traced code steps or five seconds.
+
+The same fitting calculation is available in Python:
 
 ```python
 from recursionlens import fit_growth

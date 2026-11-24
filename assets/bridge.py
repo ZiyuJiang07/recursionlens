@@ -5,6 +5,8 @@ import contextlib
 import html
 import io
 import json
+import sys
+import time
 
 import recursionlens
 from recursionlens import fit_growth, record_tutor, trace
@@ -13,6 +15,9 @@ from recursionlens._render import render_report
 
 MAX_TUTOR_STEPS = 1500
 MAX_JSON_CHARS = 400_000
+MAX_GROWTH_SAMPLES = 30
+MAX_GROWTH_STEPS = 200_000
+MAX_GROWTH_SECONDS = 5
 
 
 def _message(exc: BaseException) -> str:
@@ -161,16 +166,69 @@ def run_payload(code: str, call: str) -> str:
         return json.dumps({"error": _message(exc)}, ensure_ascii=False)
 
 
-def growth_payload(code: str, call_template: str, start: int, stop: int) -> str:
-    """Measure executed bodies across the preset sizes of a built-in example."""
+def suggest_growth_call(call: str) -> str:
+    """Replace the first integer argument in a call with the size placeholder."""
+    call = (call or "").strip()
     try:
-        if start > stop:
-            raise ValueError("The growth measurement needs at least one input.")
+        expression = _parse_call(call)
+    except (SyntaxError, ValueError):
+        return ""
+
+    for argument in [*expression.args, *(keyword.value for keyword in expression.keywords)]:
+        try:
+            value = ast.literal_eval(argument)
+        except (ValueError, TypeError, SyntaxError):
+            continue
+        if type(value) is not int:
+            continue
+        lines = call.encode("utf-8").splitlines(keepends=True)
+        start = sum(map(len, lines[:argument.lineno - 1])) + argument.col_offset
+        stop = sum(map(len, lines[:argument.end_lineno - 1])) + argument.end_col_offset
+        source = call.encode("utf-8")
+        return (source[:start] + b"{n}" + source[stop:]).decode("utf-8")
+    return ""
+
+
+@contextlib.contextmanager
+def _growth_limit():
+    """Bound a measurement and restore any previously installed Python trace."""
+    previous = sys.gettrace()
+    deadline = time.monotonic() + MAX_GROWTH_SECONDS
+    steps = 0
+
+    def check(frame, event, arg):
+        nonlocal steps
+        if frame.f_code.co_filename != "<web>":
+            return check
+        steps += 1
+        if steps > MAX_GROWTH_STEPS or time.monotonic() > deadline:
+            raise RuntimeError("Growth measurement limit reached. Choose smaller inputs or fewer samples.")
+        return check
+
+    sys.settrace(check)
+    try:
+        yield
+    finally:
+        sys.settrace(previous)
+
+
+def growth_payload(code: str, call_template: str, start: int, stop: int, step: int = 1) -> str:
+    """Measure the supplied code at each size in the inclusive input range."""
+    call = None
+    try:
+        if any(type(value) is not int for value in (start, stop, step)):
+            raise ValueError("The input range and step must be integers.")
+        if start < 0 or start > stop or step < 1:
+            raise ValueError("Use a non-negative range with start <= stop and a positive step.")
+        if (stop - start) // step + 1 > MAX_GROWTH_SAMPLES:
+            raise ValueError(f"Measure at most {MAX_GROWTH_SAMPLES} input sizes at once.")
+        if "{n}" not in call_template:
+            raise ValueError("Put {n} in the call template where the input size should change.")
         compiled = compile(code, "<web>", "exec")
         samples = []
-        with contextlib.redirect_stdout(io.StringIO()):
-            for size in range(start, stop + 1):
-                call = call_template.format(n=size)
+        with contextlib.redirect_stdout(io.StringIO()), _growth_limit():
+            for size in range(start, stop + 1, step):
+                call = call_template.replace("{n}", str(size))
                 expression = _parse_call(call)
                 # The chart needs run-wide counts, so only the root call is stored.
                 target, args, kwargs = _prepare_call(compiled, expression)
@@ -199,14 +257,19 @@ def growth_payload(code: str, call_template: str, start: int, stop: int) -> str:
                     }
                 )
         fit = None
+        memoized_fit = None
         if len(samples) >= 3:
             try:
                 fit = fit_growth(
                     [sample["size"] for sample in samples],
                     [sample["naive"] for sample in samples],
                 ).to_dict()
+                memoized_fit = fit_growth(
+                    [sample["size"] for sample in samples],
+                    [sample["memoized"] for sample in samples],
+                ).to_dict()
             except ValueError:
                 fit = None
-        return json.dumps({"samples": samples, "fit": fit}, ensure_ascii=False)
+        return json.dumps({"samples": samples, "fit": fit, "memoized_fit": memoized_fit}, ensure_ascii=False)
     except BaseException as exc:  # noqa: BLE001 - show the failure in the playground
-        return json.dumps({"error": _message(exc)}, ensure_ascii=False)
+        return json.dumps({"error": _message(exc), "failed_call": call}, ensure_ascii=False)

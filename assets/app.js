@@ -18,6 +18,8 @@ const state = {
   pyodide: null,
   runPayload: null,
   growthPayload: null,
+  suggestGrowthCall: null,
+  growthInputCall: null,
   growthResult: null,
   source: "",
   steps: [],
@@ -64,6 +66,7 @@ async function boot() {
     state.pyodide.runPython(bridge);
     state.runPayload = state.pyodide.globals.get("run_payload");
     state.growthPayload = state.pyodide.globals.get("growth_payload");
+    state.suggestGrowthCall = state.pyodide.globals.get("suggest_growth_call");
 
     setStatus("ready");
     showBuild();
@@ -163,6 +166,7 @@ async function run(prediction = null) {
 
 function clearResults() {
   stopPlayback();
+  clearGrowth();
   state.source = "";
   state.steps = [];
   state.trace = null;
@@ -311,42 +315,58 @@ function drawGrowthChart(samples) {
 }
 
 function describeGrowthFit(fit) {
-  if (!fit) return "Complexity estimate unavailable for this sample.";
+  if (!fit) return "Use at least three input sizes to estimate growth.";
   const quality = Number.isFinite(fit.r2) ? `R\u00b2 ${fit.r2.toFixed(2)}` : "";
   const warning = fit.warning ? ` ${fit.warning}` : "";
-  return `Estimated growth: ${fit.model} (${quality} over ${fit.samples.length} sizes).${warning}`;
+  return `Best measured fit ${fit.model} (${quality} over ${fit.samples.length} sizes).${warning}`;
 }
 
 function showGrowth() {
-  const id = el("growth-example").value;
-  if (state.growthResult?.id === id) {
-    drawGrowthChart(state.growthResult.samples);
-    el("growth-fit").textContent = describeGrowthFit(state.growthResult.fit);
-    return;
+  const call = el("call").value.trim();
+  if (state.growthInputCall !== call) {
+    el("growth-call").value = state.suggestGrowthCall?.(call) || "";
+    state.growthInputCall = call;
   }
+  if (state.growthResult) {
+    drawGrowthChart(state.growthResult.samples);
+  }
+}
 
-  const example = (window.RL_EXAMPLES || []).find((item) => item.id === id);
-  const status = el("growth-error");
-  const output = el("growth-output");
-  output.hidden = true;
-  status.hidden = true;
+function clearGrowth() {
   state.growthResult = null;
-  if (!example?.growth || !state.growthPayload) {
-    status.textContent = "Growth measurements are unavailable.";
+  el("growth-output").hidden = true;
+  el("growth-error").hidden = true;
+}
+
+function measureGrowth(event) {
+  event.preventDefault();
+  clearGrowth();
+  const status = el("growth-error");
+  const button = el("growth-run");
+  if (!state.growthPayload) {
+    status.textContent = "Wait for the Python runtime to load.";
     status.hidden = false;
     return;
   }
 
+  button.disabled = true;
   try {
-    const { call, start, stop } = example.growth;
-    const data = JSON.parse(state.growthPayload(example.code, call, start, stop));
-    if (data.error) throw new Error(data.error);
+    const template = el("growth-call").value.trim();
+    const start = el("growth-start").valueAsNumber;
+    const stop = el("growth-stop").valueAsNumber;
+    const step = el("growth-step").valueAsNumber;
+    const data = JSON.parse(state.growthPayload(el("code").value, template, start, stop, step));
+    if (data.error) {
+      throw new Error(data.failed_call ? `${data.failed_call} — ${data.error}` : data.error);
+    }
     const samples = data.samples;
     const format = (count) => count.toLocaleString("en-US");
     const last = samples[samples.length - 1];
     el("growth-summary").textContent =
       `${last.call} took ${format(last.naive)} function body executions without memoization and ${format(last.memoized)} with it.`;
-    el("growth-fit").textContent = describeGrowthFit(data.fit);
+    state.growthResult = { samples, fit: data.fit, memoizedFit: data.memoized_fit };
+    el("growth-fit").textContent = `Without memoization — ${describeGrowthFit(state.growthResult.fit)}`;
+    el("growth-fit-cached").textContent = `With memoization — ${describeGrowthFit(state.growthResult.memoizedFit)}`;
     const rows = samples.map((sample) => {
       const row = element("tr");
       const name = element("th");
@@ -356,18 +376,19 @@ function showGrowth() {
       return row;
     });
     el("growth-counts").replaceChildren(...rows);
-    output.hidden = false;
-    state.growthResult = { id, samples, fit: data.fit };
+    el("growth-output").hidden = false;
     drawGrowthChart(samples);
   } catch (error) {
     status.textContent = String(error.message ?? error);
     status.hidden = false;
+  } finally {
+    button.disabled = false;
   }
 }
 
 function downloadGrowthCsv() {
   if (!state.growthResult) return;
-  const { id, samples } = state.growthResult;
+  const { samples } = state.growthResult;
 
   const rows = ["input_size,input_call,bodies_without_memoization,bodies_with_memoization,bodies_saved"];
   for (const sample of samples) {
@@ -380,18 +401,12 @@ function downloadGrowthCsv() {
       sample.naive - sample.memoized,
     ].join(","));
   }
-  downloadText(`recursionlens-growth-${id}.csv`, "text/csv", rows.join("\r\n") + "\r\n");
+  downloadText("recursionlens-growth.csv", "text/csv", rows.join("\r\n") + "\r\n");
 }
 
 function wireGrowth() {
-  const select = el("growth-example");
-  for (const example of window.RL_EXAMPLES || []) {
-    if (!example.growth) continue;
-    const option = element("option", example.name);
-    option.value = example.id;
-    select.append(option);
-  }
-  select.addEventListener("change", showGrowth);
+  el("growth-form").addEventListener("submit", measureGrowth);
+  el("growth-form").addEventListener("input", clearGrowth);
   el("download-growth").addEventListener("click", downloadGrowthCsv);
   window.addEventListener("resize", () => {
     if (state.view === "growth" && state.growthResult) {
